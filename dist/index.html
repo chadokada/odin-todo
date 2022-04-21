@@ -13,32 +13,62 @@
     <div class="container">
         <div class="header">This is the header</div>
         <div class="sidebar">
-            <div class="tasksbydate">
+            <div class="tasks-by-date">
                 
-                <div class="navbutton">
-                    <img src="../src/icons/inbox.png" class="navicon">Inbox
+                <div class="nav-button" id="inbox">
+                    <img src="../src/icons/inbox.png" class="nav-icon">Inbox
                 </div>
-                <div class="navbutton">
-                    <img src="../src/icons/today.png" class="navicon">Today
+                <div class="nav-button" id="today">
+                    <img src="../src/icons/today.png" class="nav-icon">Today
                 </div>
-                <div class="navbutton">
-                    <img src="../src/icons/upcoming.png" class="navicon">Upcoming
+                <div class="nav-button" id="upcoming">
+                    <img src="../src/icons/upcoming.png" class="nav-icon">Upcoming
                 </div>
             
             </div>
 
-            <div class="tasksbyproject">
+            <div class="tasks-by-project">
                 <div class="project-heading">
-                    Projects
-                    <img src="../src/icons/plus.png" class="add-project">
+                    <div>Projects</div>
+                    <div class="create-project">
+                        <i class="fa-thin fa-plus"></i>
+                    </div>
                 </div>
                 <div class="project-sidebar">
-
                 </div>
             </div>
 
         </div>
-        <div class="display-container">This is the container</div>
+        <div class="display-container">
+            <div class="section-title">Inbox</div>
+            <div class="section-content">
+                <!--
+                <div class="task-container">
+                    <i class="fa-regular fa-circle"></i>
+                    <div class="task-description">Task one</div>
+                </div>
+                -->
+
+                <div class="add-task-container">
+                    <div class="add-task-input-container">
+                        <input type="text" class="taskNameInput" value="ex: Laundry, groceries, etc">
+                        <textarea class="taskDescInput">Description</textarea>
+                        <div class="input-buttons">
+                            <input type="date">
+                        </div>
+                    </div>
+                    <div class="add-task-buttons">
+                        <button class="submit-task">Add Task</button>
+                        <button class="cancel-task">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="create-task">
+                    <i class="fa-thin fa-plus"></i>
+                    <div>Add Task</div> 
+                </div>
+            </div>
+        </div>
         <div class="footer">this is the footer</div>
     </div>
 

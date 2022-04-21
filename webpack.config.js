@@ -4,7 +4,9 @@ module.exports = {
     mode: 'development',
     entry: {
         index: './src/index.js',
-        todo: './src/modules/todo.js',
+        pageelements: './src/modules/pageelements.js',
+        task: './src/modules/task.js',
+        todolist: './src/modules/todolist.js',
         UI: './src/modules/UI.js'
     },
     devtool: 'inline-source-map',

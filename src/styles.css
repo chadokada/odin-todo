@@ -33,14 +33,14 @@ body{
     grid-template-rows: auto 1fr;
 }
 
-.tasksbydate{
+.tasks-by-date{
     display: grid;
 }
-.navicon{
+.nav-icon{
     width: 19px;
 }
 
-.tasksbyproject{
+.tasks-by-project{
     display: grid;
     grid-template-rows: auto 1fr;
 }
@@ -50,16 +50,109 @@ body{
 }
 
 .project-heading{
-    
+    display: grid;
+    grid-template-columns: 1fr auto;
+    font-weight: bold;
+    align-items: center;
+}
+
+.fa-plus{
+    color: blue;
+    font-size: 1.5em;
+    font-weight: 300;
+}
+
+.display-container{
+    grid-row: 2/3;
+    grid-column: 2/3;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    padding: 40px;
+    gap: 10px;
+}
+
+.section-title{
+    font-size: 1.25em;
     font-weight: bold;
 }
 
-
-.display-container{
-    display: grid;
-    grid-row: 2/3;
-    grid-column: 2/3
+.section-content .fa-plus{
+    color: rgb(219, 60, 50);
 }
+
+.section-content .create-task{
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    font-size: .95em;
+    color: rgb(100, 100, 100)
+}
+
+.task-container{
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+
+.task-description{
+    font-size: .98em;
+    font-weight: 400;
+}
+.fa-circle{
+    color: rgb(100, 100, 100);
+}
+
+/* Styles for Add Task Input Window*/
+
+.add-task-container{
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: 10px;
+    width: 500px; /*Update later*/
+}
+
+.add-task-input-container{
+    border: 1px solid rgb(200, 200, 200);
+    border-radius: 10px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 5px;
+}
+
+.taskNameInput{
+    height: 25px;
+}
+
+.taskDescInput{
+    height: 75px;
+}
+
+input,
+textarea{
+    border: none;
+    box-sizing: border-box;
+    font-family: Roboto;
+    font-size: .95em;
+}    
+
+textarea{
+    resize: none;
+}
+
+button{
+    border: none;
+    border-radius: 10px;
+    height: 35px;
+    font-size: .90em;
+    font-weight: bold;
+    padding: 0 10px 0 10px;
+}
+.submit-task{
+    background-color: red;
+    color: white;
+}
+
+
+/* Footerr */
 
 .footer{
     display: grid;
