@@ -4,8 +4,8 @@ module.exports = {
     mode: 'development',
     entry: {
         index: './src/index.js',
-        todo: './src/todo.js',
-        display: './src/display.js'
+        todo: './src/modules/todo.js',
+        UI: './src/modules/UI.js'
     },
     devtool: 'inline-source-map',
     output: {

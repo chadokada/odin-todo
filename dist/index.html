@@ -5,13 +5,39 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your To Do List</title>
+    <script src="https://kit.fontawesome.com/ceeedc26d5.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <script src="./index.main.js" defer></script>
 
     <div class="container">
         <div class="header">This is the header</div>
-        <div class="sidebar">This is the sidebar</div>
+        <div class="sidebar">
+            <div class="tasksbydate">
+                
+                <div class="navbutton">
+                    <img src="../src/icons/inbox.png" class="navicon">Inbox
+                </div>
+                <div class="navbutton">
+                    <img src="../src/icons/today.png" class="navicon">Today
+                </div>
+                <div class="navbutton">
+                    <img src="../src/icons/upcoming.png" class="navicon">Upcoming
+                </div>
+            
+            </div>
+
+            <div class="tasksbyproject">
+                <div class="project-heading">
+                    Projects
+                    <img src="../src/icons/plus.png" class="add-project">
+                </div>
+                <div class="project-sidebar">
+
+                </div>
+            </div>
+
+        </div>
         <div class="display-container">This is the container</div>
         <div class="footer">this is the footer</div>
     </div>
