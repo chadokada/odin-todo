@@ -1,6 +1,6 @@
 export class task{
     #taskName; #taskDescription; #dueDate; //#priority;
-    constructor(taskName, taskDescription, dueDate, priority){
+    constructor(taskName, taskDescription, dueDate, project='', priority=''){
         this.#taskName = taskName;
         this.#taskDescription= taskDescription;
         this.#dueDate = dueDate;
@@ -15,5 +15,4 @@ export class task{
     get dueDate(){
         return this.#dueDate;
     }
-
 }

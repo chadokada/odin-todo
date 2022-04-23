@@ -1,8 +1,10 @@
 export class pageElement{
-    constructor(tag, className ='', innerHTML ='', id = ''){
+    constructor(tag, className ='', innerHTML ='', id = '', type = '', name=''){
         this.className = className;
         this.innerHTML = innerHTML;
         this.id = id;
+        this.type = type;
+        this.name = name;
         this.div = document.createElement(tag);
     }
     #setClassName(){
@@ -14,6 +16,12 @@ export class pageElement{
     #setId(){
         this.id != '' ? this.div.id = this.id : null;
     }
+    #setType(){
+        this.type != '' ? this.div.type = this.type : null;
+    }
+    #setName(){
+        this.name != '' ? this.div.setAttribute('name', this.name) : null;
+    }
     setInnerHTML(text){
         this.innerHTML = text;
     }
@@ -21,6 +29,8 @@ export class pageElement{
         this.#setClassName();
         this.#setInnerHTML();
         this.#setId();
+        this.#setType();
+        this.#setName();
         return this.div;
     }
 }
