@@ -4,6 +4,7 @@ export class task{
         this.#taskName = taskName;
         this.#taskDescription= taskDescription;
         this.#dueDate = dueDate;
+        this.project = project;
         //this.#priority = priority;
     }
     get taskName(){
