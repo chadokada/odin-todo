@@ -36,13 +36,12 @@ body{
     padding: 20px;
 }
 
-.nav-button,
-.user-task-collapsed{
+.nav-button{
     display: grid;
     grid-template-columns: auto 1fr;
 }
 
-.tasks-by-date{
+.lists-by-date{
     display: grid;
 }
 .nav-icon{
@@ -92,6 +91,10 @@ body{
     grid-template-rows: auto 1fr;
     padding: 40px;
     gap: 10px;
+    /*
+    padding-left: 20vw;
+    */
+    padding-right: 40vw;
 }
 
 .section-title{
@@ -112,10 +115,15 @@ body{
 }
 
 .task-container{
-    /*
+   /*
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto 1fr auto;
     */
+}
+
+.user-task-collapsed{
+    display: grid;
+    grid-template-columns: auto 1fr auto;
 }
 
 .task-description{

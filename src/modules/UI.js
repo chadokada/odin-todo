@@ -1,8 +1,10 @@
-import * as todolist from "./todolist.js"
 import * as task from "./task.js";
+import * as project from "./project.js"
+import * as todolist from "./todolist.js"
 import * as elements from "./pageelements.js";
+import {format} from 'date-fns';
 
-const inbox = new todolist.Project('inbox');
+const inbox = new project.Project('inbox');
 
 let projects = {'inbox': inbox};
 
@@ -48,7 +50,7 @@ function addProjectFormEventListeners(){
 
 function addProject(){
     const projectName = document.querySelector('input[class="project-name-input"]').value;
-    const newProject = new todolist.Project(projectName)///, projectIndex);
+    const newProject = new project.Project(projectName)///, projectIndex);
     projects[projectName] = newProject
 
     const projectSidebar = document.querySelector('.project-sidebar');
@@ -64,7 +66,6 @@ function hideAddProjectForm(){
     //addTaskListener();
 }
 
-
 export function showProject(event){
     const sectionTitleDiv = document.querySelector('.section-title');
     const target = event.currentTarget;
@@ -75,7 +76,6 @@ export function showProject(event){
     if (sectionTitle != 'Today' || sectionTitle != 'Upcoming'){
         loadTasks();
     }
-    
 }
 
 //
@@ -92,7 +92,7 @@ export function createAddTaskBtn(){
     return createTask;
 }
 
-export function showAddTaskForm(){
+export function addTask(){
     const sectionContent = document.querySelector('.section-content');
     const addTaskPopupBtn = document.querySelector('.create-task');
     const addTaskContainer = createAddTaskForm();
@@ -104,7 +104,7 @@ export function showAddTaskForm(){
 
 function addTaskListener(){
     const createTask = document.querySelector('.create-task');
-    createTask.addEventListener('click', showAddTaskForm);
+    createTask.addEventListener('click', addTask);
 }
 
 //
@@ -113,8 +113,10 @@ function addTaskListener(){
 export function createAddTaskFormInputs(){
     const addTaskInputContainer = new elements.pageElement('div','add-task-input-container').get;
     const taskNameInput = new elements.pageElement('input', 'task-name-input','','','text').get;
-    const taskDescInput = new elements.pageElement('textarea','task-desc-input','Description').get;
-    
+    const taskDescInput = new elements.pageElement('textarea','task-desc-input','').get;
+    taskNameInput.placeholder = "Task Name (ex: 'Buy groceries', 'Clean bathroom', 'etc'";
+    taskDescInput.placeholder = "Description";
+
     const inputButtons = new elements.pageElement('div', 'input-buttons').get;
     const dateInput = new elements.pageElement('input', 'task-due-date','','','date').get;
     inputButtons.appendChild(dateInput);
@@ -173,7 +175,7 @@ function submitTask(){
     let taskDescription;
     let dueDate;
     [taskName, taskDescription, dueDate] = getTaskInputValues();
-    
+
     const newTask = new task.task(taskName, taskDescription, dueDate, currentProject);
     projects[currentProject].addTask(newTask);
 
@@ -190,10 +192,11 @@ function createTask(task){
     const userTaskContainer = new elements.pageElement('div','user-task-collapsed').get;
     const taskSymbol = document.createElement('i');
     const taskName = new elements.pageElement('div','task-name-collapsed',task.taskName).get;
+    const dueDate = new elements.pageElement('div','due-date-collapsed',task.displayDueDate).get;
     taskSymbol.className = 'fa-regular fa-circle';
     taskSymbol.id = task.taskName;
-    
-    [taskSymbol, taskName].forEach(element => userTaskContainer.appendChild(element));
+ 
+    [taskSymbol, taskName, dueDate].forEach(element => userTaskContainer.appendChild(element));
     return userTaskContainer;
 }
 
@@ -220,7 +223,6 @@ function getProject(){
 }
 
 export function loadPage(){
-
     const inboxBtn = document.querySelector("#inbox")
     const todayBtn = document.querySelector("#today");
     const upcomingBtn = document.querySelector("#upcoming")
@@ -231,7 +233,7 @@ export function loadPage(){
 
     //Event listeners for addTask functionality
     const createTaskBtn = document.querySelector('.create-task');
-    createTaskBtn.addEventListener('click', showAddTaskForm)//() => showAddTaskForm());
+    createTaskBtn.addEventListener('click', addTask)//() => addTask());
 
     //Event listeners for add Project functionality
     const createProjectBtn = document.querySelector('.create-project');

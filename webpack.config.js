@@ -6,6 +6,7 @@ module.exports = {
         index: './src/index.js',
         pageelements: './src/modules/pageelements.js',
         task: './src/modules/task.js',
+        project: './src/modules/project.js',
         todolist: './src/modules/todolist.js',
         UI: './src/modules/UI.js'
     },
