@@ -1,21 +1,21 @@
 export class Project{
-    #taskList; #projectName
+    //#taskList; #projectName
     constructor(projectName, index=''){
-        this.#projectName = projectName;
-        this.#taskList = [];
+        this.projectName = projectName;
+        this.taskList = [];
         this.index = index;
     }
-    addTask(task){
-        this.#taskList.push(task);
+    addTaskToProject(task){
+        this.taskList.push(task);
     }
     removeTask(task){
-        const index = this.#taskList.indexOf(task);
-        this.#taskList.splice(index, 1);
+        const index = this.taskList.indexOf(task);
+        this.taskList.splice(index, 1);
     }
     get tasks(){
-        return this.#taskList;
+        return this.taskList;
     }
-    get projectName(){
-        return this.#projectName;
-    }
+    //get projectName(){
+    //    return this.projectName;
+    //}
 }

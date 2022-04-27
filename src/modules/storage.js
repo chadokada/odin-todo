@@ -33,16 +33,46 @@ export class UserStorage{
 
 export function createToDoListing(){
     const userToDoList = new todolist.ToDoList();
-    localStorage.setItem('userListing', JSON.stringify(userToDoList));
+    localStorage.setItem('userList', JSON.stringify(userToDoList));
 }
 
-
-
-function addProjectToToDoListing(projectName, project){
-    localStorage['userListing'].testFunc()
+function reinitToDoList(){
+    const parsedList = JSON.parse(localStorage.getItem('userList'));
+    const userList = new todolist.ToDoList();
+    userList.reInit(parsedList);
+    return userList;
 }
 
 export function createProject(projectName){
     const newProject = new project.Project(projectName);
     addProjectToToDoListing(projectName, newProject);
+}
+
+function addProjectToToDoListing(projectName, project){
+    const userList = reinitToDoList();
+    userList.addProject(projectName, project)
+    localStorage.setItem('userList', JSON.stringify(userList))
+}
+
+function retrieveProject(projectName){
+    const userList = reinitToDoList();
+    return userList.toDoListing[projectName];
+}
+
+function reinitProject(projectName){
+    const retrievedProject = retrieveProject(projectName)
+    const newProject = new project.Project(projectName);
+    newProject.taskList = retrievedProject.taskList;
+    return newProject
+}
+
+export function addTaskToProject(projectName, newTask){
+    const userList = reinitToDoList();
+    const currentProject = reinitProject(projectName);
+
+    //console.log(project.projectName)
+
+    currentProject.addTaskToProject(newTask);
+    userList.toDoListing[projectName] = currentProject;
+    localStorage.setItem('userList', JSON.stringify(userList));
 }

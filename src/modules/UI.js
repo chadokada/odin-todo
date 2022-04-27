@@ -5,13 +5,13 @@ import * as elements from "./pageelements.js";
 import {format} from 'date-fns';
 import * as storage from "./storage.js";
 
-let projects = {};
+let toDoList = {};
 const inbox = new project.Project('inbox');
-projects['inbox'] = inbox;
+toDoList['inbox'] = inbox;
 
 storage.createToDoListing();
-//storage.createProject('inbox')
-
+storage.createProject('inbox')
+//storage.retrieveListing();
 
 //
 // Add Projects
@@ -55,7 +55,10 @@ function addProjectFormEventListeners(){
 function addProject(){
     const projectName = document.querySelector('input[class="project-name-input"]').value;
     const newProject = new project.Project(projectName)///, projectIndex);
-    projects[projectName] = newProject
+    
+    toDoList[projectName] = newProject
+    //Update to use Storage module
+
 
     const projectSidebar = document.querySelector('.project-sidebar');
     const projectBtn = new elements.pageElement('div','user-project',projectName,projectName,'',projectName).get;
@@ -174,14 +177,16 @@ function hideAddTaskForm(){
 }
 
 function submitTask(){
-    const currentProject = document.querySelector('.section-title').id;
+    const currentProjectName = document.querySelector('.section-title').id;
     let taskName;
     let taskDescription;
     let dueDate;
     [taskName, taskDescription, dueDate] = getTaskInputValues();
 
-    const newTask = new task.task(taskName, taskDescription, dueDate, currentProject);
-    projects[currentProject].addTask(newTask);
+    const newTask = new task.task(taskName, taskDescription, dueDate, currentProjectName);
+    toDoList[currentProjectName].addTaskToProject(newTask);
+
+    storage.addTaskToProject(currentProjectName, newTask)
 
     clearTasks();
     loadTasks();
@@ -223,7 +228,7 @@ function loadTasks(){
 
 function getProject(){
     const sectionTitle = document.querySelector('.section-title').id;
-    return projects[sectionTitle];
+    return toDoList[sectionTitle];
 }
 
 export function loadPage(){
