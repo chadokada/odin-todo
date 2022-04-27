@@ -3,10 +3,14 @@ import * as project from "./project.js"
 import * as todolist from "./todolist.js"
 import * as elements from "./pageelements.js";
 import {format} from 'date-fns';
+import * as storage from "./storage.js";
 
+let projects = {};
 const inbox = new project.Project('inbox');
+projects['inbox'] = inbox;
 
-let projects = {'inbox': inbox};
+storage.createToDoListing();
+//storage.createProject('inbox')
 
 
 //
@@ -238,5 +242,6 @@ export function loadPage(){
     //Event listeners for add Project functionality
     const createProjectBtn = document.querySelector('.create-project');
     createProjectBtn.addEventListener('click', () => showAddProjectForm());
+
 
 }

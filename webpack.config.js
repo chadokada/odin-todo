@@ -8,6 +8,7 @@ module.exports = {
         task: './src/modules/task.js',
         project: './src/modules/project.js',
         todolist: './src/modules/todolist.js',
+        storage: './src/modules/storage.js',
         UI: './src/modules/UI.js'
     },
     devtool: 'inline-source-map',
