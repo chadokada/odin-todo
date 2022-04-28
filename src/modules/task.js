@@ -9,10 +9,10 @@ export class task{
         this.project = project;
         //this.#priority = priority;
     }
-    get taskName(){
+    get name(){
         return this.#taskName;
     }
-    get taskDescription(){
+    get description(){
         return this.#taskDescription;
     }
     get dueDate(){
@@ -28,5 +28,43 @@ export class task{
         }else{
             return 'No Date';
         }
+    }
+}
+
+export class taskNew{
+    constructor(taskName, taskDescription, dueDate, project='', priority=''){
+        this.data = {
+            name : taskName,
+            description : taskDescription,
+            dueDate : dueDate,
+            project : project
+            //this.#priority = priority;
+        }
+    }
+    get name(){
+        return this.data.name;
+    }
+    get description(){
+        return this.data.description;
+    }
+    get dueDate(){
+        if (this.data.dueDate){
+            return this.data.dueDate;
+        } else{
+            return 'No Date';
+        }
+    }
+    get displayDueDate(){
+        if (this.data.dueDate){
+            return format(new Date(this.data.dueDate + " 00:00"),'L/d/yyyy');
+        }else{
+            return 'No Date';
+        }
+    }
+    toJson(){
+        return JSON.stringify(this.data);
+    }
+    fromJson(json){
+        this.data = json.data
     }
 }

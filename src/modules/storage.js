@@ -1,5 +1,6 @@
- import * as todolist from './todolist.js';
+ import * as list from './todolist.js';
  import * as project from './project.js';
+ import * as task from './task.js';
 
 export function storageAvailable(type) {
     var storage;
@@ -31,48 +32,46 @@ export class UserStorage{
 }
 
 
-export function createToDoListing(){
-    const userToDoList = new todolist.ToDoList();
-    localStorage.setItem('userList', JSON.stringify(userToDoList));
+export function createList(){
+    const userList = new list.List();
+    localStorage.setItem('userList', userList.toJson());
 }
 
-function reinitToDoList(){
-    const parsedList = JSON.parse(localStorage.getItem('userList'));
-    const userList = new todolist.ToDoList();
-    userList.reInit(parsedList);
+function getList(){
+    const userList = new list.List();
+    userList.fromJson(localStorage.getItem('userList'));
     return userList;
 }
 
-export function createProject(projectName){
-    const newProject = new project.Project(projectName);
-    addProjectToToDoListing(projectName, newProject);
+export function addProject(name){
+    const userList = getList();
+    const newProject = new project.ProjectNew(name);
+    userList.addProject(name, newProject)
+    localStorage.setItem('userList', userList.toJson())
 }
 
-function addProjectToToDoListing(projectName, project){
-    const userList = reinitToDoList();
-    userList.addProject(projectName, project)
-    localStorage.setItem('userList', JSON.stringify(userList))
-}
+export function getProject(projectName){
+    let userList = getList();
+    let serializedProject = userList.data.projects[projectName];
+    let newProject = new project.ProjectNew();
 
-function retrieveProject(projectName){
-    const userList = reinitToDoList();
-    return userList.toDoListing[projectName];
-}
-
-function reinitProject(projectName){
-    const retrievedProject = retrieveProject(projectName)
-    const newProject = new project.Project(projectName);
-    newProject.taskList = retrievedProject.taskList;
+    newProject.fromJson(serializedProject);
     return newProject
 }
 
-export function addTaskToProject(projectName, newTask){
-    const userList = reinitToDoList();
-    const currentProject = reinitProject(projectName);
+export function addTask(projectName, taskName, taskDesc, dueDate){
+    let userList = getList();
+    let currentProject = getProject(projectName);
 
-    //console.log(project.projectName)
+    let newTask = new task.taskNew(taskName, taskDesc, dueDate, projectName);
 
-    currentProject.addTaskToProject(newTask);
-    userList.toDoListing[projectName] = currentProject;
-    localStorage.setItem('userList', JSON.stringify(userList));
+    currentProject.addTask(newTask);
+    userList.data.projects[projectName] = currentProject;
+    localStorage.setItem('userList', userList.toJson());
+}
+
+export function getTask(serializedTask){
+    let unserializedTask = new task.taskNew();
+    unserializedTask.fromJson(serializedTask);
+    return unserializedTask;
 }

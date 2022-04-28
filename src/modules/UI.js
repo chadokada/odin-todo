@@ -1,17 +1,12 @@
 import * as task from "./task.js";
 import * as project from "./project.js"
-import * as todolist from "./todolist.js"
+import * as list from "./todolist.js"
 import * as elements from "./pageelements.js";
 import {format} from 'date-fns';
 import * as storage from "./storage.js";
 
-let toDoList = {};
-const inbox = new project.Project('inbox');
-toDoList['inbox'] = inbox;
-
-storage.createToDoListing();
-storage.createProject('inbox')
-//storage.retrieveListing();
+storage.createList();
+storage.addProject('inbox')
 
 //
 // Add Projects
@@ -54,11 +49,8 @@ function addProjectFormEventListeners(){
 
 function addProject(){
     const projectName = document.querySelector('input[class="project-name-input"]').value;
-    const newProject = new project.Project(projectName)///, projectIndex);
     
-    toDoList[projectName] = newProject
-    //Update to use Storage module
-
+    storage.addProject(projectName);
 
     const projectSidebar = document.querySelector('.project-sidebar');
     const projectBtn = new elements.pageElement('div','user-project',projectName,projectName,'',projectName).get;
@@ -183,10 +175,8 @@ function submitTask(){
     let dueDate;
     [taskName, taskDescription, dueDate] = getTaskInputValues();
 
-    const newTask = new task.task(taskName, taskDescription, dueDate, currentProjectName);
-    toDoList[currentProjectName].addTaskToProject(newTask);
-
-    storage.addTaskToProject(currentProjectName, newTask)
+    storage.addTask(currentProjectName, taskName, taskDescription, 
+        dueDate)
 
     clearTasks();
     loadTasks();
@@ -200,10 +190,10 @@ function submitTask(){
 function createTask(task){
     const userTaskContainer = new elements.pageElement('div','user-task-collapsed').get;
     const taskSymbol = document.createElement('i');
-    const taskName = new elements.pageElement('div','task-name-collapsed',task.taskName).get;
+    const taskName = new elements.pageElement('div','task-name-collapsed',task.name).get;
     const dueDate = new elements.pageElement('div','due-date-collapsed',task.displayDueDate).get;
     taskSymbol.className = 'fa-regular fa-circle';
-    taskSymbol.id = task.taskName;
+    taskSymbol.id = task.name;
  
     [taskSymbol, taskName, dueDate].forEach(element => userTaskContainer.appendChild(element));
     return userTaskContainer;
@@ -217,18 +207,18 @@ function clearTasks(){
 }
 
 function loadTasks(){
-    const project = getProject()
-    const tasks = project.tasks;
-    const sectionContent = document.querySelector('.task-container');
-    for (const task of tasks){
-        const loadedTask = createTask(task);
-        sectionContent.appendChild(loadedTask);
-    }
-}
+    let sectionTitle = document.querySelector('.section-title').id;
 
-function getProject(){
-    const sectionTitle = document.querySelector('.section-title').id;
-    return toDoList[sectionTitle];
+    let _project = storage.getProject(sectionTitle);
+    let _tasks = _project.tasks;
+    
+    const sectionContent = document.querySelector('.task-container');
+ 
+    for (const task of _tasks){
+        let deserializedTask = storage.getTask(task)
+        const taskDiv = createTask(deserializedTask);
+        sectionContent.appendChild(taskDiv);
+    }
 }
 
 export function loadPage(){

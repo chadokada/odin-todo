@@ -1,18 +1,22 @@
-export class ToDoList{
+export class List{
     //#toDoListing;
     constructor(){
-        this.toDoListing = {};
-        this.name = 'todolist';
+        this.data = {
+            projects : {},
+            name: 'todolist'
+        };
     }
-    addProject(projectKey, project){
-        this.toDoListing[projectKey] = project;
+    addProject(name, project){
+        this.data.projects[name] = project
     }
-    reInit(toDoList){
-        this.toDoListing = toDoList.toDoListing;
-        this.name = toDoList.name;
+    //reInit(toDoList){
+    //    this.toDoListing = toDoList.toDoListing;
+    //    this.name = toDoList.name;
+    //}
+    toJson(){
+        return JSON.stringify(this.data)
     }
-    testFunc(){
-        console.log("yooo")
+    fromJson(json){
+        this.data = JSON.parse(json);
     }
-
 }
