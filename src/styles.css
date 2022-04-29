@@ -106,7 +106,7 @@ body{
     color: rgb(219, 60, 50);
 }
 
-.section-content .create-task{
+.section-content .add-task{
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: center;
@@ -136,14 +136,14 @@ body{
 
 /* Styles for Add Task Input Window*/
 
-.add-task-form-container{
+.add-task-form{
     display: grid;
     grid-template-rows: 1fr auto;
     gap: 10px;
     width: 500px; /*Update later*/
 }
 
-.add-task-input-container{
+.add-task-inputs{
     border: 1px solid rgb(200, 200, 200);
     border-radius: 10px;
     display: grid;
