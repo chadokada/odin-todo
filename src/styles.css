@@ -70,7 +70,7 @@ body{
     font-weight: 300;
 }
 
-.add-project-container{
+.add-project-form{
     display: grid;
     grid-template-rows: 1fr auto;
     gap: 10px;

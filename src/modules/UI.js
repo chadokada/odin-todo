@@ -12,11 +12,104 @@ storage.addProject('inbox')
 // Add Projects
 //
 
-function createAddProjectButtons(){
+class addProjectButton {
+    constructor(){
+        this.addProject = new elements.pageElement('div', 
+            'add-project').get;
+        this.addSymbol = document.createElement('i');
+    }
+    createButton(){
+        this.addSymbol.className = 'fa-thin fa-plus';
+        this.addProject.appendChild(this.addSymbol);
+    }
+    showProjectForm(){
+        let projectSidebar = document.querySelector('.project-sidebar');
+        let _addProjectForm = document.querySelector('.add-project-form');
+        //const addProjectContainer = createAddProjectForm(); //replace with class
+        //projectSidebar.appendChild(addProjectContainer);
+        //addProjectFormEventListeners(); //replace with class
+        if (_addProjectForm == null){
+            _addProjectForm = new addProjectForm()
+            projectSidebar.appendChild(_addProjectForm.form);
+        }
+
+    }
+    startListeners(){
+        this.addProject.addEventListener('click', () => 
+            this.showProjectForm())
+    }
+    get button(){
+        this.createButton();
+        this.startListeners();
+        return this.addProject;
+    }
+}
+
+export function showAddProjectForm(){ //addded to class
+    const projectSidebar = document.querySelector('.project-sidebar');
+    const addProjectContainer = createAddProjectForm();
+    projectSidebar.appendChild(addProjectContainer);
+    addProjectFormEventListeners();
+}
+
+class addProjectForm {
+    constructor(){
+        this.addProjectButtons = new elements.pageElement('div',
+        'add-project-buttons').get;
+        this.submitProjectBtn = new elements.pageElement('button', 
+        'submit-project', 'Submit').get;
+        this.cancelProjectBtn = new elements.pageElement('button', 
+        'cancel-project','Cancel').get;
+        this.addProjectForm = new elements.pageElement("div",
+        "add-project-form").get;
+        this.projectNameInput = new elements.pageElement('input', 
+        'project-name-input','','','text').get;
+    }
+    #createButtons(){
+        [this.submitProjectBtn, this.cancelProjectBtn].forEach(element =>
+            this.addProjectButtons.appendChild(element))
+    }
+    #createForm(){
+        this.#createButtons();
+        [this.projectNameInput, this.addProjectButtons].forEach(element => 
+            this.addProjectForm.appendChild(element));
+    }
+    #hideForm(){
+        this.addProjectForm.remove();
+    }
+    #submitForm(){
+        let projectName = this.projectNameInput.value;
+        if (projectName == ''){
+            alert('You must enter a project name.')
+        } else {
+            storage.addProject(projectName);
+            let projectSidebar = document.querySelector('.project-sidebar');
+            let projectBtn = new elements.pageElement('div','user-project',
+                projectName,projectName,'',projectName).get;
+            projectSidebar.appendChild(projectBtn);
+            
+            
+            this.#hideForm();
+        }
+    }
+    #startListeners(){
+        this.cancelProjectBtn.addEventListener('click', () => this.#hideForm());
+        this.submitProjectBtn.addEventListener('click', 
+            () => this.#submitForm());
+    }
+    get form(){
+        this.#createForm();
+        this.#startListeners();
+        return this.addProjectForm;
+    }
+}
+
+//addded to class
+function createAddProjectButtons(){ 
     const addProjectButtons = new elements.pageElement('div',
         'add-project-buttons').get;
     const submitProjectBtn = new elements.pageElement('button', 
-        'submit-project', 'Add Project').get;
+        'submit-project', 'Submit').get;
     const cancelProjectBtn = new elements.pageElement('button', 
         'cancel-project','Cancel').get;
 
@@ -26,9 +119,10 @@ function createAddProjectButtons(){
     return addProjectButtons;
 }
 
-function createAddProjectForm(){
+//added to class
+function createAddProjectForm(){ 
     const addProjectContainer = new elements.pageElement("div",
-        "add-project-container").get;
+        "add-project-form").get;
     const projectNameInput = new elements.pageElement('input', 
         'project-name-input','','','text').get;
     const addProjectbuttons = createAddProjectButtons();
@@ -38,18 +132,12 @@ function createAddProjectForm(){
     return addProjectContainer;
 }
 
-export function showAddProjectForm(){
-    const projectSidebar = document.querySelector('.project-sidebar');
-    const addProjectContainer = createAddProjectForm();
-    projectSidebar.appendChild(addProjectContainer);
-    addProjectFormEventListeners();
-}
-
-function addProjectFormEventListeners(){
-    const submitProjectBtn = document.querySelector('.submit-project');
-    const cancelProjectBtn = document.querySelector('.cancel-project');
-    submitProjectBtn.addEventListener('click', () => addProject());
-    cancelProjectBtn.addEventListener('click', () => hideAddProjectForm());
+//added to class
+function hideAddProjectForm(){ 
+    const addProjectContainer = document.querySelector(
+        '.add-project-form');
+    addProjectContainer.remove();
+    //addTaskListener();
 }
 
 function addProject(){
@@ -62,15 +150,10 @@ function addProject(){
     const projectBtn = new elements.pageElement('div','user-project',
         projectName,projectName,'',projectName).get;
     projectSidebar.appendChild(projectBtn);
+
+    //should this be a separate class?
     projectBtn.addEventListener('click', (event) => showProject(event))
     hideAddProjectForm();
-}
-
-function hideAddProjectForm(){
-    const addProjectContainer = document.querySelector(
-        '.add-project-container');
-    addProjectContainer.remove();
-    //addTaskListener();
 }
 
 export function showProject(event){
@@ -85,9 +168,20 @@ export function showProject(event){
     }
 }
 
+//partially added
+function addProjectFormEventListeners(){
+    const submitProjectBtn = document.querySelector('.submit-project');
+    const cancelProjectBtn = document.querySelector('.cancel-project');
+    submitProjectBtn.addEventListener('click', () => addProject());
+    cancelProjectBtn.addEventListener('click', () => hideAddProjectForm());
+}
+ 
+
 //
-// Show Add Task Form Button Functionality
+/////////////////////////////////////////////
 //
+
+
 class addTaskButton {
     constructor(){
         this.createTask = new elements.pageElement('div', 'add-task').get;
@@ -119,37 +213,10 @@ class addTaskButton {
         return this.createTask;
     }
 }
-export function createAddTaskBtn(){ //addded to class
-    const createTask = new elements.pageElement('div', 'add-task').get;
-    const addSymbol = document.createElement('i');
-    const createDesc = new elements.pageElement('div','','Add Task').get;
-    
-    addSymbol.className = 'fa-thin fa-plus';
-    [addSymbol, createDesc].forEach(element => createTask.appendChild(element));
-    return createTask;
-}
-
-export function addTask(){ //class implemented
-    const sectionContent = document.querySelector('.section-content');
-    const addTaskPopupBtn = document.querySelector('.add-task');
-    //const addTaskForm = createAddTaskForm();//Replace with class method
-    let _addTaskForm = new addTaskForm();
-
-    addTaskPopupBtn.remove();
-    sectionContent.appendChild(_addTaskForm.form);
-    //_addTaskForm.startListeners();
-    //addTaskFormEventListeners();
-}
-
-function addTaskListener(){ //class implemented
-    const createTask = document.querySelector('.add-task');
-    createTask.addEventListener('click', addTask);
-}
 
 //
 // Add Task Form Functionality
 //
-
 
 class addTaskForm{
     constructor(){
@@ -215,8 +282,6 @@ class addTaskForm{
         this.#hideForm();
     }
     #startListeners(){
-        //const cancelTaskBtn = document.querySelector('.cancel-task');
-        //const submitTaskBtn = document.querySelector('.submit-task');
         this.cancelTaskBtn.addEventListener('click', () => this.#hideForm());
         this.submitTaskBtn.addEventListener('click', () => this.#submitTask());
     }
@@ -225,105 +290,10 @@ class addTaskForm{
         this.#createFormButtons();
         [this.addTaskInputs, this.addTaskButtons].forEach(element => 
             this.addTaskForm.appendChild(element));
-        this.#startListeners(); //testing
+        this.#startListeners(); 
         return this.addTaskForm;
     }
 }
-
-/*
-export function createAddTaskFormInputs(){//added to class
-    const addTaskInputContainer = new elements.pageElement('div',
-        'add-task-inputs').get;
-    const taskNameInput = new elements.pageElement('input', 'task-name-input',
-        '','','text').get;
-    const taskDescInput = new elements.pageElement('textarea','task-desc-input',
-        '').get;
-
-    const inputButtons = new elements.pageElement('div', 'input-buttons').get;
-    const dateInput = new elements.pageElement('input', 'task-due-date','','',
-        'date').get;
-
-    //-----------
-    taskNameInput.placeholder = `Task Name (ex: Buy groceries,`+
-        ` Clean bathroom, etc)`;
-    taskDescInput.placeholder = "Description";
-
-
-    inputButtons.appendChild(dateInput);
-    //need to add dropdown to show existing projects
-
-    [taskNameInput, taskDescInput, inputButtons].forEach(
-        element => addTaskInputContainer.appendChild(element));
-
-    return addTaskInputContainer;
-}
-
-export function createAddTaskFormBtns(){ //added to class
-    const addTaskButtons = new elements.pageElement('div',
-        'add-task-buttons').get;
-    const submitTaskBtn = new elements.pageElement('button','submit-task',
-        'Submit').get;
-    const cancelTaskBtn = new elements.pageElement('button', 'cancel-task', 
-        'Cancel').get;
-
-    [submitTaskBtn, cancelTaskBtn].forEach(element => 
-        addTaskButtons.appendChild(element));
-    return addTaskButtons;
-}
-
-export function createAddTaskForm(){ //added to class
-    const addTaskContainer = new elements.pageElement("div",
-        "add-task-form").get;
-
-    const addTaskInputContainer = createAddTaskFormInputs();
-    const addTaskButtons = createAddTaskFormBtns();
-
-    [addTaskInputContainer, addTaskButtons].forEach(element => 
-        addTaskContainer.appendChild(element));
-    return addTaskContainer;
-}
-
-function addTaskFormEventListeners(){ //addded to class
-    const cancelTaskBtn = document.querySelector('.cancel-task');
-    const submitTaskBtn = document.querySelector('.submit-task');
-
-    cancelTaskBtn.addEventListener('click', () => hideAddTaskForm());
-    submitTaskBtn.addEventListener('click', () => submitTask());
-}
-
-function hideAddTaskForm(){ //added to class
-    const sectionContent = document.querySelector('.section-content');
-    const addTaskFormContainer = document.querySelector(
-        '.add-task-form');
-
-    const addTaskPopupBtn = createAddTaskBtn();
-    addTaskFormContainer.remove();
-    sectionContent.appendChild(addTaskPopupBtn);
-    addTaskListener();
-}
-
-function submitTask(){ //added to class
-    const currentProjectName = document.querySelector('.section-title').id;
-    let taskName;
-    let taskDescription;
-    let dueDate;
-    [taskName, taskDescription, dueDate] = getTaskInputValues();
-
-    storage.addTask(currentProjectName, taskName, taskDescription, 
-        dueDate)
-
-    clearTasks();
-    loadTasks();
-    hideAddTaskForm();
-}
-
-function getTaskInputValues(){//added to class
-    const taskName = document.querySelector('input[class="task-name-input"]');
-    const taskDesc = document.querySelector('.task-desc-input');
-    const dueDate = document.querySelector('.task-due-date');
-    return [taskName.value, taskDesc.value, dueDate.value];
-}
-*/
 
 //
 // Display tasks
@@ -354,7 +324,6 @@ function clearTasks(){
 
 function loadTasks(){
     let sectionTitle = document.querySelector('.section-title').id;
-
     let _project = storage.getProject(sectionTitle);
     let _tasks = _project.tasks;
     
@@ -376,14 +345,11 @@ export function loadPage(){
     todayBtn.addEventListener("click", (event) => showProject(event));
     upcomingBtn.addEventListener("click", (event) => showProject(event));
 
-    //Event listeners for addTask functionality
-    //replace with class method
-    const createTaskBtn = document.querySelector('.add-task');
-    createTaskBtn.addEventListener('click', addTask)//() => addTask());
+    let sectionContent = document.querySelector('.section-content');
+    let addTask = new addTaskButton();
+    sectionContent.appendChild(addTask.button);
 
-    //Event listeners for add Project functionality
-    const createProjectBtn = document.querySelector('.create-project');
-    createProjectBtn.addEventListener('click', () => showAddProjectForm());
-
-
+    let projectHeading = document.querySelector('.project-heading');
+    let addProject = new addProjectButton();
+    projectHeading.appendChild(addProject.button);
 }
