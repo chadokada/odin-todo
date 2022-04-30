@@ -9,19 +9,27 @@ export class UserStorage{
 
 
 export function createList(){
-    const userList = new list.List();
-    localStorage.setItem('userList', userList.toJson());
+    let userList = localStorage.getItem('userList');
+    if (userList == null){
+        userList = new list.List();
+        localStorage.setItem('userList', userList.toJson());
+    }
 }
 
 function getList(){
-    const userList = new list.List();
+    let userList = new list.List();
     userList.fromJson(localStorage.getItem('userList'));
     return userList;
 }
 
+export function projectExists(projectName){
+    let userList = getList();
+    return userList.projectInList(projectName);
+}
+
 export function addProject(name){
-    const userList = getList();
-    const newProject = new project.ProjectNew(name);
+    let userList = getList();
+    let newProject = new project.ProjectNew(name);
     userList.addProject(name, newProject)
     localStorage.setItem('userList', userList.toJson())
 }

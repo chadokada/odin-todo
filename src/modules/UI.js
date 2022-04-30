@@ -5,9 +5,6 @@ import * as elements from "./pageelements.js";
 import {format} from 'date-fns';
 import * as storage from "./storage.js";
 
-storage.createList();
-storage.addProject('inbox')
-
 //
 // Add Projects
 //
@@ -25,14 +22,10 @@ class addProjectButton {
     showProjectForm(){
         let projectSidebar = document.querySelector('.project-sidebar');
         let _addProjectForm = document.querySelector('.add-project-form');
-        //const addProjectContainer = createAddProjectForm(); //replace with class
-        //projectSidebar.appendChild(addProjectContainer);
-        //addProjectFormEventListeners(); //replace with class
         if (_addProjectForm == null){
             _addProjectForm = new addProjectForm()
             projectSidebar.appendChild(_addProjectForm.form);
         }
-
     }
     startListeners(){
         this.addProject.addEventListener('click', () => 
@@ -43,13 +36,6 @@ class addProjectButton {
         this.startListeners();
         return this.addProject;
     }
-}
-
-export function showAddProjectForm(){ //addded to class
-    const projectSidebar = document.querySelector('.project-sidebar');
-    const addProjectContainer = createAddProjectForm();
-    projectSidebar.appendChild(addProjectContainer);
-    addProjectFormEventListeners();
 }
 
 class addProjectForm {
@@ -82,14 +68,15 @@ class addProjectForm {
         if (projectName == ''){
             alert('You must enter a project name.')
         } else {
-            storage.addProject(projectName);
-            let projectSidebar = document.querySelector('.project-sidebar');
-            let projectBtn = new elements.pageElement('div','user-project',
-                projectName,projectName,'',projectName).get;
-            projectSidebar.appendChild(projectBtn);
-            
-            
-            this.#hideForm();
+            if (storage.projectExists(projectName)){
+                alert('Project already exists.');
+            } else {
+                storage.addProject(projectName);
+                let projectSidebar = document.querySelector('.project-sidebar');
+                let projectBtn = new ProjectButton(projectName);
+                projectSidebar.appendChild(projectBtn.button);
+                this.#hideForm();
+            }
         }
     }
     #startListeners(){
@@ -104,94 +91,41 @@ class addProjectForm {
     }
 }
 
-//addded to class
-function createAddProjectButtons(){ 
-    const addProjectButtons = new elements.pageElement('div',
-        'add-project-buttons').get;
-    const submitProjectBtn = new elements.pageElement('button', 
-        'submit-project', 'Submit').get;
-    const cancelProjectBtn = new elements.pageElement('button', 
-        'cancel-project','Cancel').get;
-
-    [submitProjectBtn, cancelProjectBtn].forEach(element => 
-        addProjectButtons.appendChild(element));
-
-    return addProjectButtons;
-}
-
-//added to class
-function createAddProjectForm(){ 
-    const addProjectContainer = new elements.pageElement("div",
-        "add-project-form").get;
-    const projectNameInput = new elements.pageElement('input', 
-        'project-name-input','','','text').get;
-    const addProjectbuttons = createAddProjectButtons();
-    
-    [projectNameInput, addProjectbuttons].forEach(element => 
-        addProjectContainer.appendChild(element));
-    return addProjectContainer;
-}
-
-//added to class
-function hideAddProjectForm(){ 
-    const addProjectContainer = document.querySelector(
-        '.add-project-form');
-    addProjectContainer.remove();
-    //addTaskListener();
-}
-
-function addProject(){
-    const projectName = document.querySelector(
-        'input[class="project-name-input"]').value;
-    
-    storage.addProject(projectName);
-
-    const projectSidebar = document.querySelector('.project-sidebar');
-    const projectBtn = new elements.pageElement('div','user-project',
-        projectName,projectName,'',projectName).get;
-    projectSidebar.appendChild(projectBtn);
-
-    //should this be a separate class?
-    projectBtn.addEventListener('click', (event) => showProject(event))
-    hideAddProjectForm();
-}
-
-export function showProject(event){
-    const sectionTitleDiv = document.querySelector('.section-title');
-    const target = event.currentTarget;
-    const sectionTitle = target.getAttribute('name');
-    sectionTitleDiv.id = target.id;
-    sectionTitleDiv.innerHTML = sectionTitle;
-    clearTasks()
-    if (sectionTitle != 'Today' || sectionTitle != 'Upcoming'){
-        loadTasks();
+class ProjectButton{
+    constructor(name){
+        this.name = name;
+        this.projectBtn = new elements.pageElement('div','user-project',
+            this.name, this.name,'', this.name);
+    }
+    #showProject(){
+        let sectionTitleDiv = document.querySelector('.section-title');
+        sectionTitleDiv.id = this.projectBtn.id;
+        sectionTitleDiv.innerHTML = this.name;
+        clearTasks();
+        if (this.name != 'Today' || this.name != 'Upcoming'){
+            loadTasks()
+        }
+    }
+    startListeners(){
+        this.projectBtn.get.addEventListener('click', () => 
+            this.#showProject())
+    }
+    get button(){
+        this.startListeners();
+        return this.projectBtn.get;
     }
 }
 
-//partially added
-function addProjectFormEventListeners(){
-    const submitProjectBtn = document.querySelector('.submit-project');
-    const cancelProjectBtn = document.querySelector('.cancel-project');
-    submitProjectBtn.addEventListener('click', () => addProject());
-    cancelProjectBtn.addEventListener('click', () => hideAddProjectForm());
-}
- 
-
-//
-/////////////////////////////////////////////
-//
-
-
 class addTaskButton {
     constructor(){
-        this.createTask = new elements.pageElement('div', 'add-task').get;
+        this.addTaskDiv = new elements.pageElement('div', 'add-task').get;
         this.addSymbol = document.createElement('i');
         this.createDesc = new elements.pageElement('div','','Add Task').get;
     }
     createButton(){
         this.addSymbol.className = 'fa-thin fa-plus';
         [this.addSymbol, this.createDesc].forEach(element => 
-            this.createTask.appendChild(element));
+            this.addTaskDiv.appendChild(element));
     }
     #addTask(){
         let sectionContent = document.querySelector('.section-content');
@@ -205,12 +139,12 @@ class addTaskButton {
         }
     }
     startListeners(){
-        this.createTask.addEventListener('click', () => this.#addTask());
+        this.addTaskDiv.addEventListener('click', () => this.#addTask());
     }
     get button(){
         this.createButton();
         this.startListeners();
-        return this.createTask;
+        return this.addTaskDiv;
     }
 }
 
@@ -252,18 +186,18 @@ class addTaskForm{
             this.addTaskButtons.appendChild(element));
     }
     #hideForm(){
-        const sectionContent = document.querySelector('.section-content');
-        const addTaskForm = document.querySelector('.add-task-form');
-        const addBtn = new addTaskButton();
+        let sectionContent = document.querySelector('.section-content');
+        let addTaskForm = document.querySelector('.add-task-form');
+        let addBtn = new addTaskButton();
 
         addTaskForm.remove();
         sectionContent.appendChild(addBtn.button);
     }
     #getInputValues(){
-        const taskName = document.querySelector(
+        let taskName = document.querySelector(
             'input[class="task-name-input"]');
-        const taskDesc = document.querySelector('.task-desc-input');
-        const dueDate = document.querySelector('.task-due-date');
+        let taskDesc = document.querySelector('.task-desc-input');
+        let dueDate = document.querySelector('.task-due-date');
         return [taskName.value, taskDesc.value, dueDate.value];
     }
     #submitTask(){
@@ -271,12 +205,10 @@ class addTaskForm{
         let taskName;
         let taskDescription;
         let dueDate;
-        
+
         [taskName, taskDescription, dueDate] = this.#getInputValues();
-    
         storage.addTask(projectName, taskName, taskDescription, 
             dueDate)
-    
         clearTasks();
         loadTasks();
         this.#hideForm();
@@ -295,51 +227,53 @@ class addTaskForm{
     }
 }
 
-//
-// Display tasks
-//
-
 function createTask(task){
-    const userTaskContainer = new elements.pageElement('div',
+    let userTaskContainer = new elements.pageElement('div',
         'user-task-collapsed').get;
-    const taskSymbol = document.createElement('i');
-    const taskName = new elements.pageElement('div','task-name-collapsed',
+    let taskSymbol = document.createElement('i');
+    let taskName = new elements.pageElement('div','task-name-collapsed',
         task.name).get;
-    const dueDate = new elements.pageElement('div','due-date-collapsed',
+    let dueDate = new elements.pageElement('div','due-date-collapsed',
         task.displayDueDate).get;
+
     taskSymbol.className = 'fa-regular fa-circle';
     taskSymbol.id = task.name;
- 
     [taskSymbol, taskName, dueDate].forEach(element => 
         userTaskContainer.appendChild(element));
     return userTaskContainer;
-}
-
-function clearTasks(){
-    const sectionContent = document.querySelector('.task-container');
-    while (sectionContent.firstChild){
-        sectionContent.removeChild(sectionContent.firstChild);
-    }
 }
 
 function loadTasks(){
     let sectionTitle = document.querySelector('.section-title').id;
     let _project = storage.getProject(sectionTitle);
     let _tasks = _project.tasks;
-    
-    const sectionContent = document.querySelector('.task-container');
+    let sectionContent = document.querySelector('.task-container');
  
-    for (const task of _tasks){
+    for (let task of _tasks){
         let deserializedTask = storage.getTask(task)
-        const taskDiv = createTask(deserializedTask);
+        let taskDiv = createTask(deserializedTask);
         sectionContent.appendChild(taskDiv);
     }
 }
 
+function clearTasks(){
+    let sectionContent = document.querySelector('.task-container');
+    while (sectionContent.firstChild){
+        sectionContent.removeChild(sectionContent.firstChild);
+    }
+}
+
+
 export function loadPage(){
-    const inboxBtn = document.querySelector("#inbox")
-    const todayBtn = document.querySelector("#today");
-    const upcomingBtn = document.querySelector("#upcoming")
+    storage.createList();
+
+    if(!storage.projectExists('inbox')){
+        storage.addProject('inbox')
+    }
+    
+    let inboxBtn = document.querySelector("#inbox")
+    let todayBtn = document.querySelector("#today");
+    let upcomingBtn = document.querySelector("#upcoming")
 
     inboxBtn.addEventListener("click", (event) => showProject(event));
     todayBtn.addEventListener("click", (event) => showProject(event));
@@ -353,3 +287,136 @@ export function loadPage(){
     let addProject = new addProjectButton();
     projectHeading.appendChild(addProject.button);
 }
+
+
+/*
+export function showAddProjectForm(){ //addded to class
+    let projectSidebar = document.querySelector('.project-sidebar');
+    let addProjectContainer = createAddProjectForm();
+    projectSidebar.appendChild(addProjectContainer);
+    addProjectFormEventListeners();
+}
+*/
+
+/*
+//addded to class
+function createAddProjectButtons(){ 
+    let addProjectButtons = new elements.pageElement('div',
+        'add-project-buttons').get;
+    let submitProjectBtn = new elements.pageElement('button', 
+        'submit-project', 'Submit').get;
+    let cancelProjectBtn = new elements.pageElement('button', 
+        'cancel-project','Cancel').get;
+
+    [submitProjectBtn, cancelProjectBtn].forEach(element => 
+        addProjectButtons.appendChild(element));
+
+    return addProjectButtons;
+}
+
+//added to class
+function createAddProjectForm(){ 
+    let addProjectContainer = new elements.pageElement("div",
+        "add-project-form").get;
+    let projectNameInput = new elements.pageElement('input', 
+        'project-name-input','','','text').get;
+    let addProjectbuttons = createAddProjectButtons();
+    
+    [projectNameInput, addProjectbuttons].forEach(element => 
+        addProjectContainer.appendChild(element));
+    return addProjectContainer;
+}
+
+//added to class
+function hideAddProjectForm(){ 
+    let addProjectContainer = document.querySelector(
+        '.add-project-form');
+    addProjectContainer.remove();
+    //addTaskListener();
+}
+
+//added to class
+function addProject(){
+    let projectName = document.querySelector(
+        'input[class="project-name-input"]').value;
+    
+    storage.addProject(projectName);
+
+    let projectSidebar = document.querySelector('.project-sidebar');
+    let projectBtn = new elements.pageElement('div','user-project',
+        projectName,projectName,'',projectName).get;
+    projectSidebar.appendChild(projectBtn);
+
+    //should this be a separate class?
+    projectBtn.addEventListener('click', (event) => showProject(event))
+    hideAddProjectForm();
+}
+*/
+
+
+//
+//
+/*
+export function showProject(event){
+    let sectionTitleDiv = document.querySelector('.section-title');
+    let target = event.currentTarget;
+    let sectionTitle = target.getAttribute('name');
+
+    sectionTitleDiv.id = target.id;
+    sectionTitleDiv.innerHTML = sectionTitle;
+    clearTasks()
+    if (sectionTitle != 'Today' || sectionTitle != 'Upcoming'){
+        loadTasks();
+    }
+}
+
+function clearTasks(){
+    let sectionContent = document.querySelector('.task-container');
+    while (sectionContent.firstChild){
+        sectionContent.removeChild(sectionContent.firstChild);
+    }
+}
+
+function createTask(task){
+    let userTaskContainer = new elements.pageElement('div',
+        'user-task-collapsed').get;
+    let taskSymbol = document.createElement('i');
+    let taskName = new elements.pageElement('div','task-name-collapsed',
+        task.name).get;
+    let dueDate = new elements.pageElement('div','due-date-collapsed',
+        task.displayDueDate).get;
+    taskSymbol.className = 'fa-regular fa-circle';
+    taskSymbol.id = task.name;
+ 
+    [taskSymbol, taskName, dueDate].forEach(element => 
+        userTaskContainer.appendChild(element));
+    return userTaskContainer;
+}
+
+function loadTasks(){
+    let sectionTitle = document.querySelector('.section-title').id;
+    let _project = storage.getProject(sectionTitle);
+    let _tasks = _project.tasks;
+    
+    let sectionContent = document.querySelector('.task-container');
+ 
+    for (let task of _tasks){
+        let deserializedTask = storage.getTask(task)
+        let taskDiv = createTask(deserializedTask);
+        sectionContent.appendChild(taskDiv);
+    }
+}
+
+
+//partially added
+function addProjectFormEventListeners(){
+    let submitProjectBtn = document.querySelector('.submit-project');
+    let cancelProjectBtn = document.querySelector('.cancel-project');
+    submitProjectBtn.addEventListener('click', () => addProject());
+    cancelProjectBtn.addEventListener('click', () => hideAddProjectForm());
+}
+*/ 
+
+//
+/////////////////////////////////////////////
+//

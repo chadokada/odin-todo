@@ -9,10 +9,10 @@ export class List{
     addProject(name, project){
         this.data.projects[name] = project
     }
-    //reInit(toDoList){
-    //    this.toDoListing = toDoList.toDoListing;
-    //    this.name = toDoList.name;
-    //}
+    projectInList(checkProject){
+        let projectKeys = Object.keys(this.data.projects);
+        return projectKeys.includes(checkProject);
+    }
     toJson(){
         return JSON.stringify(this.data)
     }
