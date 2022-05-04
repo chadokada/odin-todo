@@ -35,12 +35,19 @@ export function addProject(name){
 }
 
 export function getProject(projectName){
-    let userList = getList();
-    let serializedProject = userList.data.projects[projectName];
-    let newProject = new project.ProjectNew();
+    if (projectExists(projectName)){
+        let userList = getList();
+        let serializedProject = userList.data.projects[projectName];
+        let newProject = new project.ProjectNew();
 
-    newProject.fromJson(serializedProject);
-    return newProject
+        newProject.fromJson(serializedProject);
+        return newProject;
+    }
+}
+
+export function getProjectNames(){
+    let userList = getList();
+    return Object.keys(userList.data.projects);
 }
 
 export function addTask(projectName, taskName, taskDesc, dueDate){
@@ -48,6 +55,9 @@ export function addTask(projectName, taskName, taskDesc, dueDate){
     let currentProject = getProject(projectName);
 
     let newTask = new task.taskNew(taskName, taskDesc, dueDate, projectName);
+
+    //console.log(projectName)
+    //console.log(currentProject)
 
     currentProject.addTask(newTask);
     userList.data.projects[projectName] = currentProject;

@@ -94,8 +94,26 @@ class addProjectForm {
 class ProjectButton{
     constructor(name){
         this.name = name;
-        this.projectBtn = new elements.pageElement('div','user-project',
-            this.name, this.name,'', this.name);
+        this.projectBtn = new elements.pageElement('div','nav-button',
+            '', this.name,'', this.name).get;
+        this.icon = document.createElement('i');
+    }
+    #setIcon(){
+        if (this.name == 'Inbox'){
+            this.icon.className = 'fa-solid fa-inbox';
+        } else if (this.name == 'Today'){
+            this.icon.className = 'fa-solid fa-inbox';
+        } else if (this.name =='Upcoming'){
+            this.icon.className = 'fa-solid fa-calendar-days';
+        } else{
+            this.icon.className = 'fa-regular fa-circle';
+        }
+    }
+    #createButton(){
+        this.#setIcon();
+        let projectName = new elements.pageElement('div','', this.name).get;
+        [this.icon, projectName].forEach(element => 
+            this.projectBtn.appendChild(element));
     }
     #showProject(){
         let sectionTitleDiv = document.querySelector('.section-title');
@@ -106,13 +124,14 @@ class ProjectButton{
             loadTasks()
         }
     }
-    startListeners(){
-        this.projectBtn.get.addEventListener('click', () => 
+    #startListeners(){
+        this.projectBtn.addEventListener('click', () => 
             this.#showProject())
     }
     get button(){
-        this.startListeners();
-        return this.projectBtn.get;
+        this.#createButton();
+        this.#startListeners();
+        return this.projectBtn;
     }
 }
 
@@ -201,7 +220,7 @@ class addTaskForm{
         return [taskName.value, taskDesc.value, dueDate.value];
     }
     #submitTask(){
-        let projectName = document.querySelector('.section-title').id;
+        let projectName = document.querySelector('.section-title').innerHTML;
         let taskName;
         let taskDescription;
         let dueDate;
@@ -244,15 +263,17 @@ function createTask(task){
 }
 
 function loadTasks(){
-    let sectionTitle = document.querySelector('.section-title').id;
+    let sectionTitle = document.querySelector('.section-title').innerHTML;
     let _project = storage.getProject(sectionTitle);
-    let _tasks = _project.tasks;
     let sectionContent = document.querySelector('.task-container');
- 
-    for (let task of _tasks){
-        let deserializedTask = storage.getTask(task)
-        let taskDiv = createTask(deserializedTask);
-        sectionContent.appendChild(taskDiv);
+
+    if (_project){
+        let _tasks = _project.tasks;
+        for (let task of _tasks){
+            let deserializedTask = storage.getTask(task)
+            let taskDiv = createTask(deserializedTask);
+            sectionContent.appendChild(taskDiv);
+        }
     }
 }
 
@@ -263,21 +284,28 @@ function clearTasks(){
     }
 }
 
-
-export function loadPage(){
-    storage.createList();
-
-    if(!storage.projectExists('inbox')){
-        storage.addProject('inbox')
+function loadProjects(){
+    let projectNames = storage.getProjectNames();
+    let projectSidebar = document.querySelector('.project-sidebar');
+    for (let i = 3; i < projectNames.length; i++){
+        let projectName = projectNames[i]
+        let projectBtn = new ProjectButton(projectName);
+        projectSidebar.appendChild(projectBtn.button);
     }
-    
-    let inboxBtn = document.querySelector("#inbox")
-    let todayBtn = document.querySelector("#today");
-    let upcomingBtn = document.querySelector("#upcoming")
+}
 
-    inboxBtn.addEventListener("click", (event) => showProject(event));
-    todayBtn.addEventListener("click", (event) => showProject(event));
-    upcomingBtn.addEventListener("click", (event) => showProject(event));
+function loadPageAssets(){
+    ['Inbox','Today','Upcoming'].forEach(item => {
+        if(!storage.projectExists(item)){
+            storage.addProject(item);
+        }
+    })
+    let inbox = new ProjectButton('Inbox');
+    let today = new ProjectButton('Today');
+    let upcoming = new ProjectButton('Upcoming');
+    let listsByDate = document.querySelector('.lists-by-date');
+    [inbox, today, upcoming].forEach(element => 
+        listsByDate.appendChild(element.button));
 
     let sectionContent = document.querySelector('.section-content');
     let addTask = new addTaskButton();
@@ -288,135 +316,10 @@ export function loadPage(){
     projectHeading.appendChild(addProject.button);
 }
 
-
-/*
-export function showAddProjectForm(){ //addded to class
-    let projectSidebar = document.querySelector('.project-sidebar');
-    let addProjectContainer = createAddProjectForm();
-    projectSidebar.appendChild(addProjectContainer);
-    addProjectFormEventListeners();
-}
-*/
-
-/*
-//addded to class
-function createAddProjectButtons(){ 
-    let addProjectButtons = new elements.pageElement('div',
-        'add-project-buttons').get;
-    let submitProjectBtn = new elements.pageElement('button', 
-        'submit-project', 'Submit').get;
-    let cancelProjectBtn = new elements.pageElement('button', 
-        'cancel-project','Cancel').get;
-
-    [submitProjectBtn, cancelProjectBtn].forEach(element => 
-        addProjectButtons.appendChild(element));
-
-    return addProjectButtons;
+export function loadPage(){
+    storage.createList();
+    loadTasks();
+    loadPageAssets();
+    loadProjects();
 }
 
-//added to class
-function createAddProjectForm(){ 
-    let addProjectContainer = new elements.pageElement("div",
-        "add-project-form").get;
-    let projectNameInput = new elements.pageElement('input', 
-        'project-name-input','','','text').get;
-    let addProjectbuttons = createAddProjectButtons();
-    
-    [projectNameInput, addProjectbuttons].forEach(element => 
-        addProjectContainer.appendChild(element));
-    return addProjectContainer;
-}
-
-//added to class
-function hideAddProjectForm(){ 
-    let addProjectContainer = document.querySelector(
-        '.add-project-form');
-    addProjectContainer.remove();
-    //addTaskListener();
-}
-
-//added to class
-function addProject(){
-    let projectName = document.querySelector(
-        'input[class="project-name-input"]').value;
-    
-    storage.addProject(projectName);
-
-    let projectSidebar = document.querySelector('.project-sidebar');
-    let projectBtn = new elements.pageElement('div','user-project',
-        projectName,projectName,'',projectName).get;
-    projectSidebar.appendChild(projectBtn);
-
-    //should this be a separate class?
-    projectBtn.addEventListener('click', (event) => showProject(event))
-    hideAddProjectForm();
-}
-*/
-
-
-//
-//
-/*
-export function showProject(event){
-    let sectionTitleDiv = document.querySelector('.section-title');
-    let target = event.currentTarget;
-    let sectionTitle = target.getAttribute('name');
-
-    sectionTitleDiv.id = target.id;
-    sectionTitleDiv.innerHTML = sectionTitle;
-    clearTasks()
-    if (sectionTitle != 'Today' || sectionTitle != 'Upcoming'){
-        loadTasks();
-    }
-}
-
-function clearTasks(){
-    let sectionContent = document.querySelector('.task-container');
-    while (sectionContent.firstChild){
-        sectionContent.removeChild(sectionContent.firstChild);
-    }
-}
-
-function createTask(task){
-    let userTaskContainer = new elements.pageElement('div',
-        'user-task-collapsed').get;
-    let taskSymbol = document.createElement('i');
-    let taskName = new elements.pageElement('div','task-name-collapsed',
-        task.name).get;
-    let dueDate = new elements.pageElement('div','due-date-collapsed',
-        task.displayDueDate).get;
-    taskSymbol.className = 'fa-regular fa-circle';
-    taskSymbol.id = task.name;
- 
-    [taskSymbol, taskName, dueDate].forEach(element => 
-        userTaskContainer.appendChild(element));
-    return userTaskContainer;
-}
-
-function loadTasks(){
-    let sectionTitle = document.querySelector('.section-title').id;
-    let _project = storage.getProject(sectionTitle);
-    let _tasks = _project.tasks;
-    
-    let sectionContent = document.querySelector('.task-container');
- 
-    for (let task of _tasks){
-        let deserializedTask = storage.getTask(task)
-        let taskDiv = createTask(deserializedTask);
-        sectionContent.appendChild(taskDiv);
-    }
-}
-
-
-//partially added
-function addProjectFormEventListeners(){
-    let submitProjectBtn = document.querySelector('.submit-project');
-    let cancelProjectBtn = document.querySelector('.cancel-project');
-    submitProjectBtn.addEventListener('click', () => addProject());
-    cancelProjectBtn.addEventListener('click', () => hideAddProjectForm());
-}
-*/ 
-
-//
-/////////////////////////////////////////////
-//
