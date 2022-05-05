@@ -262,6 +262,45 @@ function createTask(task){
     return userTaskContainer;
 }
 
+class TaskDiv{
+    constructor(task, taskID){
+        this.name = task.name;
+        this.description = task.description;
+        this.dueDate = task.displayDueDate;
+        this.project = task.project;
+        this.taskID = taskID;
+        this.taskDiv = new elements.pageElement('div',
+            'user-task-collapsed').get;
+        this.taskSymbol = document.createElement('i');
+        this.nameDiv = new elements.pageElement('div','task-name-collapsed',
+            this.name).get;
+        //add description
+        this.dueDateDiv = new elements.pageElement('div',
+            'due-date-collapsed',this.dueDate).get;
+    }
+    #populateDiv(){
+        this.taskSymbol.className = 'fa-regular fa-circle';
+        this.taskSymbol.id = this.name;
+        [this.taskSymbol, this.nameDiv, this.dueDateDiv].forEach(
+            element => this.taskDiv.appendChild(element))
+    }
+    #changeName(){
+        let _task = storage.editTask(this.project, this.taskID, 'name', 'butt');
+    }
+    #startListeners(){
+        this.nameDiv.addEventListener('click', () => this.#changeName())
+    }
+    get div(){
+        this.#populateDiv();
+        this.#startListeners();
+        return this.taskDiv;
+    }
+}
+
+
+
+
+
 function loadTasks(){
     let sectionTitle = document.querySelector('.section-title').innerHTML;
     let _project = storage.getProject(sectionTitle);
@@ -269,10 +308,13 @@ function loadTasks(){
 
     if (_project){
         let _tasks = _project.tasks;
+        let taskID = 0
         for (let task of _tasks){
-            let deserializedTask = storage.getTask(task)
-            let taskDiv = createTask(deserializedTask);
-            sectionContent.appendChild(taskDiv);
+            let deserializedTask = storage.deserializeTask(task)
+            //let taskDiv = createTask(deserializedTask); //replace with class
+            let taskDiv = new TaskDiv(deserializedTask, taskID);
+            sectionContent.appendChild(taskDiv.div);
+            taskID = taskID + 1;
         }
     }
 }

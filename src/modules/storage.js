@@ -27,9 +27,15 @@ export function projectExists(projectName){
     return userList.projectInList(projectName);
 }
 
-export function addProject(name){
+export function addProject(name, taskList = ''){
     let userList = getList();
     let newProject = new project.ProjectNew(name);
+
+    if (taskList){
+        
+    }
+
+
     userList.addProject(name, newProject)
     localStorage.setItem('userList', userList.toJson())
 }
@@ -54,7 +60,7 @@ export function addTask(projectName, taskName, taskDesc, dueDate){
     let userList = getList();
     let currentProject = getProject(projectName);
 
-    let newTask = new task.taskNew(taskName, taskDesc, dueDate, projectName);
+    let newTask = new task.Task(taskName, taskDesc, dueDate, projectName);
 
     //console.log(projectName)
     //console.log(currentProject)
@@ -64,8 +70,41 @@ export function addTask(projectName, taskName, taskDesc, dueDate){
     localStorage.setItem('userList', userList.toJson());
 }
 
-export function getTask(serializedTask){
-    let unserializedTask = new task.taskNew();
+export function deserializeTask(serializedTask){
+    let unserializedTask = new task.Task();
     unserializedTask.fromJson(serializedTask);
     return unserializedTask;
+}
+
+function deserializeTaskList(serializedList){
+    
+    for (let i = 0; i < serializedList.length; i++){
+        let _task = new task.Task();
+        let taskJSON = serializedList[i];
+        _task.fromJson(taskJSON);
+        serializedList[i] = _task;
+    }
+
+    console.log(serializedList);
+}
+
+export function editTask(projectName, taskID, field, newValue){
+    
+    let project = getProject(projectName);
+    let taskList = project.data.taskList;
+    
+    
+    let task = taskList[taskID];
+    //logic to update user defined parameter
+    if (field == 'name'){
+        task.data.name = newValue;
+    } else if (field == 'description') {
+        task.data.description = newValue;
+    } else if (field == 'dueDate'){
+        task.data.dueDate = newValue;
+    };
+
+    //logic to send updated task list to project object
+    deserializeTaskList(taskList);
+
 }
