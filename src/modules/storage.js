@@ -2,12 +2,6 @@
  import * as project from './project.js';
  import * as task from './task.js';
 
-
-export class UserStorage{
-
-}
-
-
 export function createList(){
     let userList = localStorage.getItem('userList');
     if (userList == null){
@@ -29,13 +23,10 @@ export function projectExists(projectName){
 
 export function addProject(name, taskList = ''){
     let userList = getList();
-    let newProject = new project.ProjectNew(name);
-
+    let newProject = new project.Project(name);
     if (taskList){
-        
+        newProject.data.taskList = taskList;
     }
-
-
     userList.addProject(name, newProject)
     localStorage.setItem('userList', userList.toJson())
 }
@@ -44,7 +35,7 @@ export function getProject(projectName){
     if (projectExists(projectName)){
         let userList = getList();
         let serializedProject = userList.data.projects[projectName];
-        let newProject = new project.ProjectNew();
+        let newProject = new project.Project();
 
         newProject.fromJson(serializedProject);
         return newProject;
@@ -59,11 +50,7 @@ export function getProjectNames(){
 export function addTask(projectName, taskName, taskDesc, dueDate){
     let userList = getList();
     let currentProject = getProject(projectName);
-
     let newTask = new task.Task(taskName, taskDesc, dueDate, projectName);
-
-    //console.log(projectName)
-    //console.log(currentProject)
 
     currentProject.addTask(newTask);
     userList.data.projects[projectName] = currentProject;
@@ -86,23 +73,21 @@ function deserializeTaskList(serializedList){
     return serializedList;
 }
 
-export function editTask(projectName, taskID, field, newValue){
-    
+export function editTask(projectName, taskID, taskName, taskDesc, taskDate){
     let project = getProject(projectName);
     let taskList = project.data.taskList;
-    
-    
     let task = taskList[taskID];
-    //logic to update user defined parameter
-    if (field == 'name'){
-        task.data.name = newValue;
-    } else if (field == 'description') {
-        task.data.description = newValue;
-    } else if (field == 'dueDate'){
-        task.data.dueDate = newValue;
-    };
 
-    //logic to send updated task list to project object
-    deserializeTaskList(taskList);
+    task.data.name = taskName;
+    task.data.description = taskDesc;
+    task.data.dueDate = taskDate;
 
+    let _taskList = deserializeTaskList(taskList);
+    addProject(projectName, _taskList)
+}
+
+export function deleteTask(projectName, task){
+    let project = getProject(projectName);
+    project.removeTask(task);
+    addProject(projectName, project.tasks);
 }

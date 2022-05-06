@@ -1,8 +1,4 @@
-import * as task from "./task.js";
-import * as project from "./project.js"
-import * as list from "./todolist.js"
 import * as elements from "./pageelements.js";
-import {format} from 'date-fns';
 import * as storage from "./storage.js";
 
 //
@@ -149,10 +145,8 @@ class addTaskButton {
     #addTask(){
         let sectionContent = document.querySelector('.section-content');
         let addTaskPopupBtn = document.querySelector('.add-task');
-
         let _addTaskForm = new addTaskForm();
         sectionContent.appendChild(_addTaskForm.form);
-        
         if (addTaskPopupBtn){
             addTaskPopupBtn.remove();
         }
@@ -172,11 +166,15 @@ class addTaskButton {
 //
 
 class addTaskForm{
-    constructor(taskName = '', taskDesc = '', taskDue = '', update = false){
+    constructor(taskName = '', taskDesc = '', taskDue = '', 
+        update = false, taskDiv = '', taskID = ''){
         this.taskName = taskName;
         this.taskDesc = taskDesc;
         this.taskDue = taskDue;
         this.update = update;
+        this.taskDiv = taskDiv;
+        this.taskID = taskID;
+
         this.addTaskInputs = new elements.pageElement('div',
             'add-task-inputs').get;
         this.taskNameInput = new elements.pageElement('input', 
@@ -197,20 +195,12 @@ class addTaskForm{
             "add-task-form").get;
     }
     #setFormValues(){
-        if (this.taskName != ''){
-            this.taskNameInput.value = this.taskName;
-        } else {
+        this.taskName != '' ? this.taskNameInput.value = this.taskName : 
             this.taskNameInput.placeholder = `Task Name (ex: Buy groceries,`+
             ` Clean bathroom, etc)`;
-        }
-        if (this.taskDesc != ''){
-            this.taskDescInput.value = this.taskDesc;
-        } else {
+        this.taskDesc != '' ? this.taskDescInput.value = this.taskDesc : 
             this.taskDescInput.placeholder = `Description`;
-        }
-        if (this.taskDue != ''){
-            this.dateInput.value = this.taskDue;
-        }
+        this.taskDue != '' ? this.dateInput.value = this.taskDue : null;
     }
     #createFormInputs(){
         this.inputButtons.appendChild(this.dateInput);
@@ -221,13 +211,17 @@ class addTaskForm{
         [this.submitTaskBtn, this.cancelTaskBtn].forEach(element => 
             this.addTaskButtons.appendChild(element));
     }
-    #hideForm(){
-        let sectionContent = document.querySelector('.section-content');
-        let addTaskForm = document.querySelector('.add-task-form');
-        let addBtn = new addTaskButton();
-
-        addTaskForm.remove();
-        sectionContent.appendChild(addBtn.button);
+    #hideForm(event){
+        if (this.update) {
+            let addForm = event.target.parentElement.parentElement;
+            addForm.replaceWith(this.taskDiv)
+        } else {
+            let sectionContent = document.querySelector('.section-content');
+            let addTaskForm = document.querySelector('.add-task-form');
+            let addBtn = new addTaskButton();
+            addTaskForm.remove();
+            sectionContent.appendChild(addBtn.button);
+        }
     }
     #getInputValues(){
         let taskName = document.querySelector(
@@ -239,19 +233,25 @@ class addTaskForm{
     #submitTask(){
         let projectName = document.querySelector('.section-title').innerHTML;
         let taskName;
-        let taskDescription;
+        let taskDesc;
         let dueDate;
-
-        [taskName, taskDescription, dueDate] = this.#getInputValues();
-        storage.addTask(projectName, taskName, taskDescription, 
-            dueDate)
+        [taskName, taskDesc, dueDate] = this.#getInputValues();
+        if (this.update) {
+            storage.editTask(projectName, this.taskID, taskName, taskDesc, 
+                dueDate);
+        } else {
+            storage.addTask(projectName, taskName, taskDesc, dueDate)
+        }
         clearTasks();
         loadTasks();
-        this.#hideForm();
+        this.update ? null : this.#hideForm();
     }
     #startListeners(){
         if(this.update){
-            
+            this.cancelTaskBtn.addEventListener('click', (event) => 
+                this.#hideForm(event));
+            this.submitTaskBtn.addEventListener('click', () => 
+                this.#submitTask());
         } else{
             this.cancelTaskBtn.addEventListener('click', () => this.#hideForm());
             this.submitTaskBtn.addEventListener('click', () => this.#submitTask());
@@ -268,24 +268,9 @@ class addTaskForm{
     }
 }
 
-function createTask(task){
-    let userTaskContainer = new elements.pageElement('div',
-        'user-task-collapsed').get;
-    let taskSymbol = document.createElement('i');
-    let taskName = new elements.pageElement('div','task-name-collapsed',
-        task.name).get;
-    let dueDate = new elements.pageElement('div','due-date-collapsed',
-        task.displayDueDate).get;
-
-    taskSymbol.className = 'fa-regular fa-circle';
-    taskSymbol.id = task.name;
-    [taskSymbol, taskName, dueDate].forEach(element => 
-        userTaskContainer.appendChild(element));
-    return userTaskContainer;
-}
-
 class TaskDiv{
     constructor(task, taskID){
+        this.task = task;
         this.name = task.name;
         this.description = task.description;
         this.dueDate = task.displayDueDate;
@@ -307,14 +292,20 @@ class TaskDiv{
         [this.taskSymbol, this.nameDiv, this.descDiv, this.dueDateDiv].forEach(
             element => this.taskDiv.appendChild(element))
     }
-    #changeName(){
-        //let _task = storage.editTask(this.project, this.taskID, 'name', 'butt');
-        let editForm = new addTaskForm(this.name,this.description,this.dueDate,true);
+    #editTask(){
+        let editForm = new addTaskForm(this.name, this.description, 
+            this.task.dueDate, true, this.taskDiv, this.taskID);
         this.taskDiv.replaceWith(editForm.form)
-        //need to beef up the addtaskForm
+    }
+    #deleteTask(){
+        storage.deleteTask(this.project, this.task);
+        clearTasks();
+        loadTasks();
     }
     #startListeners(){
-        this.nameDiv.addEventListener('click', () => this.#changeName())
+        [this.nameDiv, this.descDiv, this.dueDateDiv].forEach(div => 
+            div.addEventListener('click', () => this.#editTask()));
+        this.taskSymbol.addEventListener('click', () => this.#deleteTask());
     }
     get div(){
         this.#populateDiv();
@@ -322,10 +313,6 @@ class TaskDiv{
         return this.taskDiv;
     }
 }
-
-
-
-
 
 function loadTasks(){
     let sectionTitle = document.querySelector('.section-title').innerHTML;
@@ -337,7 +324,6 @@ function loadTasks(){
         let taskID = 0
         for (let task of _tasks){
             let deserializedTask = storage.deserializeTask(task)
-            //let taskDiv = createTask(deserializedTask); //replace with class
             let taskDiv = new TaskDiv(deserializedTask, taskID);
             sectionContent.appendChild(taskDiv.div);
             taskID = taskID + 1;
@@ -390,4 +376,3 @@ export function loadPage(){
     loadPageAssets();
     loadProjects();
 }
-

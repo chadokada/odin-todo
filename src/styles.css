@@ -34,15 +34,22 @@ body{
     box-shadow: 3px 0px 7px -5px #94a3b8;
     grid-template-rows: auto 1fr;
     padding: 20px;
+    gap: 20px;
 }
 
 .nav-button{
     display: grid;
     grid-template-columns: auto 1fr;
+    column-gap: 10px;
+}
+
+.project-sidebar > .nav-button{
+    margin-bottom: 10px;
 }
 
 .lists-by-date{
     display: grid;
+    gap: 10px;
 }
 .nav-icon{
     width: 19px;
@@ -51,6 +58,7 @@ body{
 .tasks-by-project{
     display: grid;
     grid-template-rows: auto 1fr;
+    gap: 10px;
 }
 
 .project-heading > img{

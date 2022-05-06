@@ -1,27 +1,4 @@
 export class Project{
-    //#taskList; #projectName
-    constructor(name, index=''){
-        this.name = name;
-        this.taskList = [];
-        this.index = index;
-    }
-    addTaskToProject(task){
-        this.taskList.push(task);
-    }
-    removeTask(task){
-        const index = this.taskList.indexOf(task);
-        this.taskList.splice(index, 1);
-    }
-    get tasks(){
-        return this.taskList;
-    }
-    //get projectName(){
-    //    return this.projectName;
-    //}
-}
-
-export class ProjectNew{
-    //#taskList; #projectName
     constructor(projectName, index=''){
         this.data = {
             name : projectName,
@@ -45,7 +22,4 @@ export class ProjectNew{
     fromJson(json){
         this.data = json.data;
     }
-    //get projectName(){
-    //    return this.projectName;
-    //}
 }
