@@ -172,7 +172,11 @@ class addTaskButton {
 //
 
 class addTaskForm{
-    constructor(){
+    constructor(taskName = '', taskDesc = '', taskDue = '', update = false){
+        this.taskName = taskName;
+        this.taskDesc = taskDesc;
+        this.taskDue = taskDue;
+        this.update = update;
         this.addTaskInputs = new elements.pageElement('div',
             'add-task-inputs').get;
         this.taskNameInput = new elements.pageElement('input', 
@@ -192,10 +196,23 @@ class addTaskForm{
         this.addTaskForm = new elements.pageElement("div",
             "add-task-form").get;
     }
-    #createFormInputs(){
-        this.taskNameInput.placeholder = `Task Name (ex: Buy groceries,`+
+    #setFormValues(){
+        if (this.taskName != ''){
+            this.taskNameInput.value = this.taskName;
+        } else {
+            this.taskNameInput.placeholder = `Task Name (ex: Buy groceries,`+
             ` Clean bathroom, etc)`;
-        this.taskDescInput.placeholder = "Description";
+        }
+        if (this.taskDesc != ''){
+            this.taskDescInput.value = this.taskDesc;
+        } else {
+            this.taskDescInput.placeholder = `Description`;
+        }
+        if (this.taskDue != ''){
+            this.dateInput.value = this.taskDue;
+        }
+    }
+    #createFormInputs(){
         this.inputButtons.appendChild(this.dateInput);
         [this.taskNameInput, this.taskDescInput, this.inputButtons].forEach(
             element => this.addTaskInputs.appendChild(element));
@@ -233,10 +250,15 @@ class addTaskForm{
         this.#hideForm();
     }
     #startListeners(){
-        this.cancelTaskBtn.addEventListener('click', () => this.#hideForm());
-        this.submitTaskBtn.addEventListener('click', () => this.#submitTask());
+        if(this.update){
+            
+        } else{
+            this.cancelTaskBtn.addEventListener('click', () => this.#hideForm());
+            this.submitTaskBtn.addEventListener('click', () => this.#submitTask());
+        }
     }
     get form(){
+        this.#setFormValues()
         this.#createFormInputs();
         this.#createFormButtons();
         [this.addTaskInputs, this.addTaskButtons].forEach(element => 
@@ -274,18 +296,22 @@ class TaskDiv{
         this.taskSymbol = document.createElement('i');
         this.nameDiv = new elements.pageElement('div','task-name-collapsed',
             this.name).get;
-        //add description
+        this.descDiv = new elements.pageElement('div','task-desc-collapsed', 
+            this.description).get;
         this.dueDateDiv = new elements.pageElement('div',
             'due-date-collapsed',this.dueDate).get;
     }
     #populateDiv(){
         this.taskSymbol.className = 'fa-regular fa-circle';
         this.taskSymbol.id = this.name;
-        [this.taskSymbol, this.nameDiv, this.dueDateDiv].forEach(
+        [this.taskSymbol, this.nameDiv, this.descDiv, this.dueDateDiv].forEach(
             element => this.taskDiv.appendChild(element))
     }
     #changeName(){
-        let _task = storage.editTask(this.project, this.taskID, 'name', 'butt');
+        //let _task = storage.editTask(this.project, this.taskID, 'name', 'butt');
+        let editForm = new addTaskForm(this.name,this.description,this.dueDate,true);
+        this.taskDiv.replaceWith(editForm.form)
+        //need to beef up the addtaskForm
     }
     #startListeners(){
         this.nameDiv.addEventListener('click', () => this.#changeName())

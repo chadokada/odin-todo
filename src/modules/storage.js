@@ -77,15 +77,13 @@ export function deserializeTask(serializedTask){
 }
 
 function deserializeTaskList(serializedList){
-    
     for (let i = 0; i < serializedList.length; i++){
         let _task = new task.Task();
         let taskJSON = serializedList[i];
         _task.fromJson(taskJSON);
         serializedList[i] = _task;
     }
-
-    console.log(serializedList);
+    return serializedList;
 }
 
 export function editTask(projectName, taskID, field, newValue){
