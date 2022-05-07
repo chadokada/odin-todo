@@ -49,7 +49,7 @@ class addProjectForm {
     }
     #createButtons(){
         [this.submitProjectBtn, this.cancelProjectBtn].forEach(element =>
-            this.addProjectButtons.appendChild(element))
+            this.addProjectButtons.appendChild(element));
     }
     #createForm(){
         this.#createButtons();
@@ -117,7 +117,13 @@ class ProjectButton{
         sectionTitleDiv.innerHTML = this.name;
         clearTasks();
         if (this.name != 'Today' || this.name != 'Upcoming'){
+            console.log(this.name == 'Today');
             loadTasks()
+        } 
+        if (this.name == 'Today'){
+            storage.getTodaysTasks();
+            loadTasks();
+            console.log('yeee')
         }
     }
     #startListeners(){
@@ -375,4 +381,6 @@ export function loadPage(){
     loadTasks();
     loadPageAssets();
     loadProjects();
+
+    
 }

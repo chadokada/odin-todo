@@ -1,3 +1,7 @@
+import {isToday} from 'date-fns';
+import {parseISO} from 'date-fns';
+import * as task from './task.js';
+
 export class Project{
     constructor(projectName, index=''){
         this.data = {
@@ -16,6 +20,17 @@ export class Project{
     get tasks(){
         return this.data.taskList;
     }
+    todayTasks(){
+        let todayTaskList = [];
+        for (let task of this.data.taskList){
+            let dueDate = parseISO(task.data.dueDate);
+            let isTaskToday = isToday(dueDate);
+            isTaskToday ? todayTaskList.push(task) : null;
+        }
+        return todayTaskList;
+    }
+
+
     toJson(){
         return JSON.stringify(this.data);
     }

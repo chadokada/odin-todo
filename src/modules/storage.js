@@ -47,6 +47,16 @@ export function getProjectNames(){
     return Object.keys(userList.data.projects);
 }
 
+
+export function getTodaysTasks(){
+    let _list = getList();
+    let todaysTasks = _list.todayTasks();
+    todaysTasks = deserializeTaskList(todaysTasks);
+    addProject('Today', todaysTasks);
+    console.log('ok')
+}
+
+
 export function addTask(projectName, taskName, taskDesc, dueDate){
     let userList = getList();
     let currentProject = getProject(projectName);
