@@ -93,6 +93,7 @@ class ProjectButton{
         this.projectBtn = new elements.pageElement('div','nav-button',
             '', this.name,'', this.name).get;
         this.icon = document.createElement('i');
+        this.projectName = new elements.pageElement('div','', this.name).get;
     }
     #setIcon(){
         if (this.name == 'Inbox'){
@@ -107,8 +108,7 @@ class ProjectButton{
     }
     #createButton(){
         this.#setIcon();
-        let projectName = new elements.pageElement('div','', this.name).get;
-        [this.icon, projectName].forEach(element => 
+        [this.icon, this.projectName].forEach(element => 
             this.projectBtn.appendChild(element));
     }
     #showProject(){
@@ -116,15 +116,7 @@ class ProjectButton{
         sectionTitleDiv.id = this.projectBtn.id;
         sectionTitleDiv.innerHTML = this.name;
         clearTasks();
-        if (this.name != 'Today' || this.name != 'Upcoming'){
-            console.log(this.name == 'Today');
-            loadTasks()
-        } 
-        if (this.name == 'Today'){
-            storage.getTodaysTasks();
-            loadTasks();
-            console.log('yeee')
-        }
+        loadTasks();
     }
     #startListeners(){
         this.projectBtn.addEventListener('click', () => 
@@ -172,45 +164,55 @@ class addTaskButton {
 //
 
 class addTaskForm{
-    constructor(taskName = '', taskDesc = '', taskDue = '', 
-        update = false, taskDiv = '', taskID = ''){
-        this.taskName = taskName;
-        this.taskDesc = taskDesc;
-        this.taskDue = taskDue;
-        this.update = update;
+    constructor(task = null, taskDiv = '', taskID = ''){
+        this.task = task;
         this.taskDiv = taskDiv;
         this.taskID = taskID;
-
+        this.addTaskForm = new elements.pageElement("div",
+        "add-task-form").get;
         this.addTaskInputs = new elements.pageElement('div',
             'add-task-inputs').get;
         this.taskNameInput = new elements.pageElement('input', 
             'task-name-input', '','','text').get;
         this.taskDescInput = new elements.pageElement('textarea',
             'task-desc-input','').get;
-        this.inputButtons = new elements.pageElement('div', 
-            'input-buttons').get;
+        this.inputRow = new elements.pageElement('div', 'input-row').get;
         this.dateInput = new elements.pageElement('input', 'task-due-date','',
             '','date').get;
+        this.projectInput = new elements.pageElement('select',
+            'task-project-input').get;
         this.addTaskButtons = new elements.pageElement('div',
             'add-task-buttons').get;
         this.submitTaskBtn = new elements.pageElement('button','submit-task',
             'Submit').get;
         this.cancelTaskBtn = new elements.pageElement('button', 'cancel-task', 
             'Cancel').get;
-        this.addTaskForm = new elements.pageElement("div",
-            "add-task-form").get;
+    }
+    #setProjectDropDown(){
+        let projects = storage.getProjectNames();
+        for (let project of projects){
+            let _project = document.createElement('option');
+            [_project.value, _project.innerHTML] = [project, project];
+            this.projectInput.appendChild(_project);
+        }
     }
     #setFormValues(){
-        this.taskName != '' ? this.taskNameInput.value = this.taskName : 
+        if (this.task){
+            this.taskNameInput.value = this.task.name;
+            this.taskDescInput.value = this.task.description;
+            this.projectInput.value = this.task.project;
+            this.dateInput.value = this.task.dueDate;
+        } else{
             this.taskNameInput.placeholder = `Task Name (ex: Buy groceries,`+
             ` Clean bathroom, etc)`;
-        this.taskDesc != '' ? this.taskDescInput.value = this.taskDesc : 
             this.taskDescInput.placeholder = `Description`;
-        this.taskDue != '' ? this.dateInput.value = this.taskDue : null;
+            this.projectInput.value = document.querySelector('.section-title').innerHTML
+        }
     }
     #createFormInputs(){
-        this.inputButtons.appendChild(this.dateInput);
-        [this.taskNameInput, this.taskDescInput, this.inputButtons].forEach(
+        [this.dateInput, this.projectInput].forEach(element => 
+            this.inputRow.appendChild(element));
+        [this.taskNameInput, this.taskDescInput, this.inputRow].forEach(
             element => this.addTaskInputs.appendChild(element));
     }
     #createFormButtons(){
@@ -218,7 +220,7 @@ class addTaskForm{
             this.addTaskButtons.appendChild(element));
     }
     #hideForm(event){
-        if (this.update) {
+        if (this.task) {
             let addForm = event.target.parentElement.parentElement;
             addForm.replaceWith(this.taskDiv)
         } else {
@@ -230,40 +232,41 @@ class addTaskForm{
         }
     }
     #getInputValues(){
-        let taskName = document.querySelector(
-            'input[class="task-name-input"]');
+        let projectName = document.querySelector('.task-project-input');
+        let taskName = document.querySelector('input[class="task-name-input"]');
         let taskDesc = document.querySelector('.task-desc-input');
         let dueDate = document.querySelector('.task-due-date');
-        return [taskName.value, taskDesc.value, dueDate.value];
+        return [projectName.value ,taskName.value, taskDesc.value, 
+            dueDate.value];
     }
     #submitTask(){
-        let projectName = document.querySelector('.section-title').innerHTML;
+        let projectName;
         let taskName;
         let taskDesc;
         let dueDate;
-        [taskName, taskDesc, dueDate] = this.#getInputValues();
-        if (this.update) {
-            storage.editTask(projectName, this.taskID, taskName, taskDesc, 
-                dueDate);
+        [projectName, taskName, taskDesc, dueDate] = this.#getInputValues();
+        if (this.task) {
+            if(this.task.project == projectName){
+                storage.editTask(this.taskID, projectName, taskName, taskDesc, 
+                    dueDate);
+            } else {
+                storage.deleteTask(this.task.project, this.task);
+                storage.addTask(projectName, taskName, taskDesc, dueDate);
+            }
         } else {
-            storage.addTask(projectName, taskName, taskDesc, dueDate)
+            storage.addTask(projectName, taskName, taskDesc, dueDate);
         }
         clearTasks();
         loadTasks();
-        this.update ? null : this.#hideForm();
+        this.task ? null : this.#hideForm();
     }
     #startListeners(){
-        if(this.update){
-            this.cancelTaskBtn.addEventListener('click', (event) => 
-                this.#hideForm(event));
-            this.submitTaskBtn.addEventListener('click', () => 
-                this.#submitTask());
-        } else{
-            this.cancelTaskBtn.addEventListener('click', () => this.#hideForm());
-            this.submitTaskBtn.addEventListener('click', () => this.#submitTask());
-        }
+        this.cancelTaskBtn.addEventListener('click', (event) => 
+            this.#hideForm(event));
+        this.submitTaskBtn.addEventListener('click', () => this.#submitTask());
     }
     get form(){
+        this.#setProjectDropDown();
         this.#setFormValues()
         this.#createFormInputs();
         this.#createFormButtons();
@@ -277,40 +280,39 @@ class addTaskForm{
 class TaskDiv{
     constructor(task, taskID){
         this.task = task;
-        this.name = task.name;
-        this.description = task.description;
-        this.dueDate = task.displayDueDate;
-        this.project = task.project;
         this.taskID = taskID;
         this.taskDiv = new elements.pageElement('div',
             'user-task-collapsed').get;
         this.taskSymbol = document.createElement('i');
         this.nameDiv = new elements.pageElement('div','task-name-collapsed',
-            this.name).get;
+            this.task.name).get;
         this.descDiv = new elements.pageElement('div','task-desc-collapsed', 
-            this.description).get;
+            this.task.description).get;
+        this.projectDiv = new elements.pageElement('div',
+            'task-project-collapsed', this.task.project).get;
         this.dueDateDiv = new elements.pageElement('div',
-            'due-date-collapsed',this.dueDate).get;
+            'due-date-collapsed',this.task.displayDueDate).get;
     }
     #populateDiv(){
         this.taskSymbol.className = 'fa-regular fa-circle';
-        this.taskSymbol.id = this.name;
-        [this.taskSymbol, this.nameDiv, this.descDiv, this.dueDateDiv].forEach(
-            element => this.taskDiv.appendChild(element))
+        this.taskSymbol.id = this.task.name;
+        [this.taskSymbol, this.nameDiv, this.descDiv, this.projectDiv, 
+            this.dueDateDiv].forEach(element => 
+                this.taskDiv.appendChild(element))
     }
-    #editTask(){
-        let editForm = new addTaskForm(this.name, this.description, 
-            this.task.dueDate, true, this.taskDiv, this.taskID);
+    #editTask(task){
+        let editForm = new addTaskForm(task, this.taskDiv, this.taskID);
         this.taskDiv.replaceWith(editForm.form)
     }
     #deleteTask(){
-        storage.deleteTask(this.project, this.task);
+        storage.deleteTask(this.task.project, this.task);
         clearTasks();
         loadTasks();
     }
     #startListeners(){
-        [this.nameDiv, this.descDiv, this.dueDateDiv].forEach(div => 
-            div.addEventListener('click', () => this.#editTask()));
+        [this.nameDiv, this.descDiv, this.projectDiv, this.dueDateDiv].forEach(
+            div => div.addEventListener('click', () => 
+                this.#editTask(this.task)));
         this.taskSymbol.addEventListener('click', () => this.#deleteTask());
     }
     get div(){
@@ -324,17 +326,22 @@ function loadTasks(){
     let sectionTitle = document.querySelector('.section-title').innerHTML;
     let _project = storage.getProject(sectionTitle);
     let sectionContent = document.querySelector('.task-container');
+    let _tasks = [];
 
-    if (_project){
-        let _tasks = _project.tasks;
-        let taskID = 0
-        for (let task of _tasks){
-            let deserializedTask = storage.deserializeTask(task)
-            let taskDiv = new TaskDiv(deserializedTask, taskID);
-            sectionContent.appendChild(taskDiv.div);
-            taskID = taskID + 1;
-        }
+    if (sectionTitle != 'Today'){
+        _tasks = _project.tasks;
+    } else if (sectionTitle == 'Today'){
+        _tasks = storage.getTodaysTasks();
     }
+    
+    let taskID = 0
+    for (let task of _tasks){
+        let deserializedTask = storage.deserializeTask(task)
+        let taskDiv = new TaskDiv(deserializedTask, taskID);
+        sectionContent.appendChild(taskDiv.div);
+        taskID = taskID + 1;
+    }
+
 }
 
 function clearTasks(){
@@ -347,7 +354,7 @@ function clearTasks(){
 function loadProjects(){
     let projectNames = storage.getProjectNames();
     let projectSidebar = document.querySelector('.project-sidebar');
-    for (let i = 3; i < projectNames.length; i++){
+    for (let i = 1; i < projectNames.length; i++){
         let projectName = projectNames[i]
         let projectBtn = new ProjectButton(projectName);
         projectSidebar.appendChild(projectBtn.button);
@@ -355,7 +362,7 @@ function loadProjects(){
 }
 
 function loadPageAssets(){
-    ['Inbox','Today','Upcoming'].forEach(item => {
+    ['Inbox'].forEach(item => {
         if(!storage.projectExists(item)){
             storage.addProject(item);
         }
@@ -378,9 +385,8 @@ function loadPageAssets(){
 
 export function loadPage(){
     storage.createList();
-    loadTasks();
     loadPageAssets();
     loadProjects();
-
+    loadTasks();
     
 }

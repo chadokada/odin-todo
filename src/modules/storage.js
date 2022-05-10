@@ -47,15 +47,12 @@ export function getProjectNames(){
     return Object.keys(userList.data.projects);
 }
 
-
 export function getTodaysTasks(){
     let _list = getList();
     let todaysTasks = _list.todayTasks();
     todaysTasks = deserializeTaskList(todaysTasks);
-    addProject('Today', todaysTasks);
-    console.log('ok')
+    return todaysTasks;
 }
-
 
 export function addTask(projectName, taskName, taskDesc, dueDate){
     let userList = getList();
@@ -83,7 +80,7 @@ function deserializeTaskList(serializedList){
     return serializedList;
 }
 
-export function editTask(projectName, taskID, taskName, taskDesc, taskDate){
+export function editTask(taskID, projectName, taskName, taskDesc, taskDate){
     let project = getProject(projectName);
     let taskList = project.data.taskList;
     let task = taskList[taskID];

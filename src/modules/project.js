@@ -20,6 +20,9 @@ export class Project{
     get tasks(){
         return this.data.taskList;
     }
+    get name(){
+        return this.data.name;
+    }
     todayTasks(){
         let todayTaskList = [];
         for (let task of this.data.taskList){
@@ -29,8 +32,6 @@ export class Project{
         }
         return todayTaskList;
     }
-
-
     toJson(){
         return JSON.stringify(this.data);
     }
