@@ -91,9 +91,10 @@ class ProjectButton{
     constructor(name){
         this.name = name;
         this.projectBtn = new elements.pageElement('div','nav-button',
-            '', this.name,'', this.name).get;
+            '', '','', this.name).get;
         this.icon = document.createElement('i');
-        this.projectName = new elements.pageElement('div','', this.name).get;
+        this.projectName = new elements.pageElement('div','', this.name,
+            this.name).get;
     }
     #setIcon(){
         if (this.name == 'Inbox'){
@@ -118,9 +119,20 @@ class ProjectButton{
         clearTasks();
         loadTasks();
     }
+    #deleteProject(){
+        if (this.name != 'Inbox' || this.name != 'Today' || 
+            this.name != 'Upcoming'){
+                let inbox = document.querySelector('#Inbox');
+                storage.deleteProject(this.name);
+                loadProjects();
+                inbox.click();
+        }
+    }
     #startListeners(){
-        this.projectBtn.addEventListener('click', () => 
-            this.#showProject())
+        this.projectName.addEventListener('click', () => 
+            this.#showProject());
+        this.icon.addEventListener('click', () => 
+            this.#deleteProject())
     }
     get button(){
         this.#createButton();
@@ -354,6 +366,9 @@ function clearTasks(){
 function loadProjects(){
     let projectNames = storage.getProjectNames();
     let projectSidebar = document.querySelector('.project-sidebar');
+    while (projectSidebar.firstChild){
+        projectSidebar.removeChild(projectSidebar.firstChild);
+    }
     for (let i = 1; i < projectNames.length; i++){
         let projectName = projectNames[i]
         let projectBtn = new ProjectButton(projectName);

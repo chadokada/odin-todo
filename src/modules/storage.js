@@ -36,10 +36,15 @@ export function getProject(projectName){
         let userList = getList();
         let serializedProject = userList.data.projects[projectName];
         let newProject = new project.Project();
-
         newProject.fromJson(serializedProject);
         return newProject;
     }
+}
+
+export function deleteProject(projectName){
+    let userList = getList();
+    userList.deleteProject(projectName);
+    localStorage.setItem('userList', userList.toJson())
 }
 
 export function getProjectNames(){

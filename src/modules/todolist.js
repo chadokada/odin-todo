@@ -15,6 +15,9 @@ export class List{
         let projectKeys = Object.keys(this.data.projects);
         return projectKeys.includes(checkProject);
     }
+    deleteProject(projectName){
+        delete this.data.projects[projectName];
+    }
     toJson(){
         return JSON.stringify(this.data)
     }
