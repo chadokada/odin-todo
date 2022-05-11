@@ -1,6 +1,6 @@
 import {isToday} from 'date-fns';
 import {parseISO} from 'date-fns';
-import * as task from './task.js';
+import * as date from 'date-fns';
 
 export class Project{
     constructor(projectName, index=''){
@@ -31,6 +31,22 @@ export class Project{
             isTaskToday ? todayTaskList.push(task) : null;
         }
         return todayTaskList;
+    }
+    thisWeeksTasks(){
+        let today = date.startOfToday()
+        let endOfWeek = date.endOfDay(date.add(today,{days: 7}))
+        let thisWeek = {};
+        for (let task of this.data.taskList){
+            let dueDate = parseISO(task.data.dueDate);
+            if (date.isWithinInterval(dueDate, {start: today, end: endOfWeek})){
+                if (thisWeek[dueDate]){
+                    thisWeek[dueDate] = thisWeek[dueDate].concat([task]);
+                } else {
+                    thisWeek[dueDate] = [task];
+                }
+            }
+        }
+        return thisWeek;
     }
     toJson(){
         return JSON.stringify(this.data);

@@ -1,6 +1,7 @@
- import * as list from './todolist.js';
- import * as project from './project.js';
- import * as task from './task.js';
+import * as list from './todolist.js';
+import * as project from './project.js';
+import * as task from './task.js';
+import * as date from 'date-fns';
 
 export function createList(){
     let userList = localStorage.getItem('userList');
@@ -59,6 +60,21 @@ export function getTodaysTasks(){
     return todaysTasks;
 }
 
+export function getThisWeeksTasks(){
+    let _list = getList();
+    let thisWeeksTasks = _list.thisWeeksTasks();
+    let thisWeek = []
+    let today = date.startOfToday()
+
+    for (let i = 0; i < 8; i++){
+        let currentDay = date.add(today, {days: i});
+        if (thisWeeksTasks[currentDay]){
+            thisWeek = thisWeek.concat(thisWeeksTasks[currentDay]);
+        }
+    }
+    return deserializeTaskList(thisWeek);
+}
+
 export function addTask(projectName, taskName, taskDesc, dueDate){
     let userList = getList();
     let currentProject = getProject(projectName);
@@ -93,7 +109,7 @@ export function editTask(taskID, projectName, taskName, taskDesc, taskDate){
     task.data.name = taskName;
     task.data.description = taskDesc;
     task.data.dueDate = taskDate;
-
+    
     let _taskList = deserializeTaskList(taskList);
     addProject(projectName, _taskList)
 }

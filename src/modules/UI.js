@@ -1,6 +1,5 @@
 import * as elements from "./pageelements.js";
 import * as storage from "./storage.js";
-
 //
 // Add Projects
 //
@@ -340,12 +339,13 @@ function loadTasks(){
     let sectionContent = document.querySelector('.task-container');
     let _tasks = [];
 
-    if (sectionTitle != 'Today'){
+    if (sectionTitle != 'Today' && sectionTitle != 'Upcoming'){
         _tasks = _project.tasks;
     } else if (sectionTitle == 'Today'){
         _tasks = storage.getTodaysTasks();
+    } else if (sectionTitle == 'Upcoming'){
+        _tasks = storage.getThisWeeksTasks();
     }
-    
     let taskID = 0
     for (let task of _tasks){
         let deserializedTask = storage.deserializeTask(task)
@@ -353,7 +353,6 @@ function loadTasks(){
         sectionContent.appendChild(taskDiv.div);
         taskID = taskID + 1;
     }
-
 }
 
 function clearTasks(){
@@ -403,5 +402,4 @@ export function loadPage(){
     loadPageAssets();
     loadProjects();
     loadTasks();
-    
 }

@@ -30,6 +30,22 @@ export class List{
         }
         return todayTasks;
     }
+    thisWeeksTasks(){
+        let thisWeek = {};
+        for (let key in this.data.projects){
+            let _project = new project.Project();
+            _project.fromJson(this.data.projects[key]);
+            let _thisWeek = _project.thisWeeksTasks();
+            for (let date in _thisWeek){
+                if (thisWeek[date]){
+                    thisWeek[date] = thisWeek[date].concat(_thisWeek[date]);
+                } else {
+                    thisWeek[date] = _thisWeek[date];
+                }
+            }
+        }
+        return thisWeek;
+    }
     fromJson(json){
         this.data = JSON.parse(json);
     }
